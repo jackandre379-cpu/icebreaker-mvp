@@ -68,11 +68,12 @@ export default function ProfilePage() {
       setPhotoURL(url); // show immediately
       await setDoc(doc(db, 'profiles', user.uid), { photoURL: url }, { merge: true });
       setStatus('Photo updated!');
-    } catch (err) {
-      console.error(err);
-      alert('Upload failed. Check Firebase Storage setup and rules.');
-      setStatus('');
-    } finally {
+   } catch (err) {
+  console.error('Upload failed:', err);
+  alert(`Upload failed: ${err?.code || ''} ${err?.message || err}`);
+  setStatus('');
+}
+ finally {
       setTimeout(() => setStatus(''), 2000);
     }
   };
