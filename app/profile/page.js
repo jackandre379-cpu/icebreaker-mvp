@@ -3,7 +3,8 @@
 import { useEffect, useState } from 'react';
 import { db, ensureAnonAuth } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { storage } from '../../lib/firebase';
+import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 
 export default function ProfilePage() {
   const [firstName, setFirstName] = useState('');
@@ -59,7 +60,6 @@ export default function ProfilePage() {
     setStatus('Uploading photo…');
     try {
       const user = await ensureAnonAuth();
-      const storage = getStorage();
       const key = `userPhotos/${user.uid}/${Date.now()}-${file.name}`;
       const storageRef = ref(storage, key);
       await uploadBytes(storageRef, file);
