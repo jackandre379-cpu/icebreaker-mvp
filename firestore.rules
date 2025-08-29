@@ -1,0 +1,42 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAuthed() {
+      return request.auth != null;
+    }
+
+    // Profiles: user can read others' profiles, write only their own
+    match /profiles/{uid} {
+      allow read: if isAuthed();
+      allow write: if isAuthed() && request.auth.uid == uid;
+    }
+
+    // Sessions: presence by uid
+    match /sessions/{uid} {
+      allow read: if isAuthed();
+      allow write: if isAuthed() && request.auth.uid == uid
+        && !( 'lat' in request.resource.data || 'lng' in request.resource.data ); // prevent raw coords
+    }
+
+    // Requests: create by authenticated users; read if you are sender or receiver
+    match /requests/{id} {
+      allow create: if isAuthed();
+      allow read, update: if isAuthed() && (
+        request.auth.uid == resource.data.fromUid ||
+        request.auth.uid == resource.data.toUid
+      );
+      allow delete: if false;
+    }
+
+    // Connections: read only if you are part of it, create by either side
+    match /connections/{id} {
+      allow create: if isAuthed();
+      allow read: if isAuthed() && (
+        request.auth.uid == resource.data.aUid ||
+        request.auth.uid == resource.data.bUid
+      );
+      allow update, delete: if false;
+    }
+  }
+}
