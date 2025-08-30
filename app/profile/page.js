@@ -1,10 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { db, ensureAnonAuth } from '../../lib/firebase';
+import { db, ensureAnonAuth, auth, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
-import { storage } from '../../lib/firebase';
-import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
+import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 export default function ProfilePage() {
   const [firstName, setFirstName] = useState('');
@@ -19,6 +18,7 @@ export default function ProfilePage() {
   useEffect(() => {
     (async () => {
       const user = await ensureAnonAuth();
+      console.log("🔑 Signed in as:", user?.uid);
       const snap = await getDoc(doc(db, 'profiles', user.uid));
       if (snap.exists()) {
         const d = snap.data();
@@ -47,7 +47,7 @@ export default function ProfilePage() {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    // (Optional) basic client-side guard
+    // Guards
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file.');
       return;
@@ -60,19 +60,22 @@ export default function ProfilePage() {
     setStatus('Uploading photo…');
     try {
       const user = await ensureAnonAuth();
+      console.log("📤 Uploading as UID:", user?.uid, "Bucket:", storage.app.options.storageBucket);
+
       const key = `userPhotos/${user.uid}/${Date.now()}-${file.name}`;
       const storageRef = ref(storage, key);
+
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
+      console.log("✅ Uploaded:", url);
       setPhotoURL(url); // show immediately
       await setDoc(doc(db, 'profiles', user.uid), { photoURL: url }, { merge: true });
       setStatus('Photo updated!');
- } catch (err) {
-  console.error('Upload failed:', err);
-  alert(`Upload failed: ${err?.code || ''} ${err?.message || err}`);
-}
- finally {
+    } catch (err) {
+      console.error('❌ Upload failed:', err);
+      alert(`Upload failed: ${err?.code || ''} ${err?.message || err}`);
+    } finally {
       setTimeout(() => setStatus(''), 2000);
     }
   };
