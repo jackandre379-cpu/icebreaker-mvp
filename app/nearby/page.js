@@ -9,10 +9,11 @@ import {
   getDoc,
   onSnapshot,
   query,
-  where,
   setDoc,
+  where,
   serverTimestamp,
   addDoc,
+  Timestamp,
 } from 'firebase/firestore';
 
 import ProfileCard from '../../components/ProfileCard';
@@ -24,7 +25,7 @@ export default function NearbyPage() {
   const [selfUid, setSelfUid] = useState(null);
   const [openShareForUid, setOpenShareForUid] = useState(null);
 
-  // how long a session should last (must match CheckInPage EXPIRY_MINUTES)
+  // ⏰ Must match CheckInPage expiry
   const EXPIRY_MINUTES = 10;
 
   useEffect(() => {
@@ -33,13 +34,19 @@ export default function NearbyPage() {
       setSelfUid(user.uid);
 
       if (!navigator.geolocation) return;
+
       navigator.geolocation.getCurrentPosition(async (pos) => {
-        const vb = venueBucketFromLatLng(pos.coords.latitude, pos.coords.longitude, 3);
+        const vb = venueBucketFromLatLng(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          3
+        );
         setBucket(vb);
 
         // ensure own session exists with expiry
-        const now = Date.now();
-        const expiresAt = new Date(now + EXPIRY_MINUTES * 60 * 1000);
+        const expiresAt = Timestamp.fromDate(
+          new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
+        );
 
         await setDoc(
           doc(db, 'sessions', user.uid),
@@ -52,11 +59,11 @@ export default function NearbyPage() {
           { merge: true }
         );
 
-        // 🔎 Subscribe to active sessions in same bucket (not expired)
+        // 🔎 Subscribe to active sessions in same bucket
         const qSessions = query(
           collection(db, 'sessions'),
           where('venueBucket', '==', vb),
-          where('expiresAt', '>', new Date()) // filter only active
+          where('expiresAt', '>', Timestamp.now()) // ✅ compare Timestamp with Timestamp
         );
 
         const unsub = onSnapshot(qSessions, async (snap) => {
@@ -90,7 +97,7 @@ export default function NearbyPage() {
       toUid: targetUid,
       venueBucket: bucket,
       status: 'pending',
-      fieldsFrom: fields, // { ig: true/false, phone: true/false, linkedin: true/false }
+      fieldsFrom: fields,
       createdAt: serverTimestamp(),
     });
     setOpenShareForUid(null);

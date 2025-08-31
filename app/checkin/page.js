@@ -7,19 +7,20 @@ import {
   doc,
   setDoc,
   serverTimestamp,
+  Timestamp,
 } from 'firebase/firestore';
 
 export default function CheckInPage() {
   const [bucket, setBucket] = useState(null);
   const [status, setStatus] = useState('');
 
-  // ⏰ How long a check-in should last (e.g. 10 minutes)
+  // ⏰ How long a check-in should last (must match NearbyPage)
   const EXPIRY_MINUTES = 10;
 
   const checkIn = async () => {
     setStatus('Requesting location...');
     if (!navigator.geolocation) {
-      setStatus('Geolocation not supported.');
+      setStatus('❌ Geolocation not supported.');
       return;
     }
 
@@ -32,17 +33,25 @@ export default function CheckInPage() {
         setStatus('Signing in...');
         const user = await ensureAnonAuth();
 
-        const now = Date.now();
-      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
-await setDoc(doc(db, 'sessions', user.uid), {
-  uid: user.uid,
-  venueBucket: vb,
-  updatedAt: serverTimestamp(),
-  expiresAt, // <-- Firestore Timestamp
-}, { merge: true });
+        // ✅ Save expiry as Firestore Timestamp
+        const expiresAt = Timestamp.fromDate(
+          new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
+        );
 
+        await setDoc(
+          doc(db, 'sessions', user.uid),
+          {
+            uid: user.uid,
+            venueBucket: vb,
+            updatedAt: serverTimestamp(),
+            expiresAt,
+          },
+          { merge: true }
+        );
 
-        setStatus(`✅ Checked in! You are visible at ${vb} for ${EXPIRY_MINUTES} minutes.`);
+        setStatus(
+          `✅ Checked in! You are visible in ${vb} for ${EXPIRY_MINUTES} minutes.`
+        );
       },
       (err) => {
         setStatus('❌ Permission denied or error getting location.');
@@ -53,16 +62,16 @@ await setDoc(doc(db, 'sessions', user.uid), {
   };
 
   useEffect(() => {
-    // Auto-run once on mount
+    // auto-run once on mount
     checkIn().catch(console.error);
 
-    // Optional: clear session when user closes/leaves
+    // expire immediately when leaving
     const cleanup = async () => {
       try {
         const user = await ensureAnonAuth();
         await setDoc(
           doc(db, 'sessions', user.uid),
-          { expiresAt: new Date(Date.now()) }, // expire immediately
+          { expiresAt: Timestamp.now() }, // ✅ expire immediately
           { merge: true }
         );
       } catch (e) {
