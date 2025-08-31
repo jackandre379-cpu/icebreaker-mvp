@@ -7,7 +7,6 @@ import {
   doc,
   setDoc,
   serverTimestamp,
-  Timestamp,
 } from 'firebase/firestore';
 
 export default function CheckInPage() {
@@ -33,10 +32,8 @@ export default function CheckInPage() {
         setStatus('Signing in...');
         const user = await ensureAnonAuth();
 
-        // ✅ Save expiry as Firestore Timestamp
-        const expiresAt = Timestamp.fromDate(
-          new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
-        );
+        // set expiry 10 min into the future
+        const expiresAt = new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000);
 
         await setDoc(
           doc(db, 'sessions', user.uid),
@@ -44,7 +41,7 @@ export default function CheckInPage() {
             uid: user.uid,
             venueBucket: vb,
             updatedAt: serverTimestamp(),
-            expiresAt,
+            expiresAt, // ✅ stored as Firestore Timestamp
           },
           { merge: true }
         );
@@ -71,7 +68,7 @@ export default function CheckInPage() {
         const user = await ensureAnonAuth();
         await setDoc(
           doc(db, 'sessions', user.uid),
-          { expiresAt: Timestamp.now() }, // ✅ expire immediately
+          { expiresAt: new Date() }, // ✅ expire immediately
           { merge: true }
         );
       } catch (e) {
