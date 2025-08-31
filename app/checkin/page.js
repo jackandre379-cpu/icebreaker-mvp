@@ -3,11 +3,18 @@
 import { useEffect, useState } from 'react';
 import { db, ensureAnonAuth } from '../../lib/firebase';
 import { venueBucketFromLatLng } from '../../lib/venue';
-import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
+import {
+  doc,
+  setDoc,
+  serverTimestamp,
+} from 'firebase/firestore';
 
 export default function CheckInPage() {
   const [bucket, setBucket] = useState(null);
   const [status, setStatus] = useState('');
+
+  // ⏰ How long a check-in should last (e.g. 10 minutes)
+  const EXPIRY_MINUTES = 10;
 
   const checkIn = async () => {
     setStatus('Requesting location...');
@@ -15,37 +22,81 @@ export default function CheckInPage() {
       setStatus('Geolocation not supported.');
       return;
     }
-    navigator.geolocation.getCurrentPosition(async pos => {
-      const { latitude, longitude } = pos.coords;
-      const vb = venueBucketFromLatLng(latitude, longitude, 3);
-      setBucket(vb);
-      setStatus('Signing in...');
-      const user = await ensureAnonAuth();
-      await setDoc(doc(db, 'sessions', user.uid), {
-        uid: user.uid,
-        venueBucket: vb,
-        updatedAt: serverTimestamp()
-      });
-      setStatus('Checked in! You are visible to others in this place.');
-    }, err => {
-      setStatus('Permission denied or error getting location.');
-    }, { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 });
+
+    navigator.geolocation.getCurrentPosition(
+      async (pos) => {
+        const { latitude, longitude } = pos.coords;
+        const vb = venueBucketFromLatLng(latitude, longitude, 3);
+        setBucket(vb);
+
+        setStatus('Signing in...');
+        const user = await ensureAnonAuth();
+
+        const now = Date.now();
+      const expiresAt = new Date(Date.now() + 10 * 60 * 1000);
+await setDoc(doc(db, 'sessions', user.uid), {
+  uid: user.uid,
+  venueBucket: vb,
+  updatedAt: serverTimestamp(),
+  expiresAt, // <-- Firestore Timestamp
+}, { merge: true });
+
+
+        setStatus(`✅ Checked in! You are visible at ${vb} for ${EXPIRY_MINUTES} minutes.`);
+      },
+      (err) => {
+        setStatus('❌ Permission denied or error getting location.');
+        console.error(err);
+      },
+      { enableHighAccuracy: false, timeout: 10000, maximumAge: 0 }
+    );
   };
 
   useEffect(() => {
-    // auto-run once
+    // Auto-run once on mount
     checkIn().catch(console.error);
+
+    // Optional: clear session when user closes/leaves
+    const cleanup = async () => {
+      try {
+        const user = await ensureAnonAuth();
+        await setDoc(
+          doc(db, 'sessions', user.uid),
+          { expiresAt: new Date(Date.now()) }, // expire immediately
+          { merge: true }
+        );
+      } catch (e) {
+        console.error('Failed to clear session on unload:', e);
+      }
+    };
+    window.addEventListener('beforeunload', cleanup);
+    return () => window.removeEventListener('beforeunload', cleanup);
   }, []);
 
   return (
-    <div style={{ display:'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gap: 12 }}>
       <h2>Check in</h2>
       <p>We store only a coarse venue bucket, not your exact location.</p>
-      <button onClick={checkIn} style={{ background:'black', color:'white', borderRadius:8, padding:'8px 12px', width:'fit-content' }}>
+      <button
+        onClick={checkIn}
+        style={{
+          background: 'black',
+          color: 'white',
+          borderRadius: 8,
+          padding: '8px 12px',
+          width: 'fit-content',
+        }}
+      >
         Re-check in
       </button>
-      <div><b>Status:</b> {status}</div>
-      {bucket && <div><b>Venue bucket:</b> {bucket}</div>}
+      <div>
+        <b>Status:</b> {status}
+      </div>
+      {bucket && (
+        <div>
+          <b>Venue bucket:</b> {bucket}
+        </div>
+      )}
     </div>
   );
 }
