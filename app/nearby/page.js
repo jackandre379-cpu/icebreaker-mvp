@@ -1,9 +1,19 @@
 'use client';
 
-import { useEffect, useMemo, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { db, ensureAnonAuth } from '../../lib/firebase';
 import { venueBucketFromLatLng } from '../../lib/venue';
-import { collection, doc, getDoc, onSnapshot, query, setDoc, where, serverTimestamp, addDoc } from 'firebase/firestore';
+import {
+  collection,
+  doc,
+  getDoc,
+  onSnapshot,
+  query,
+  setDoc,
+  serverTimestamp,
+  addDoc,
+  Timestamp
+} from 'firebase/firestore';
 import ProfileCard from '../../components/ProfileCard';
 import ShareModal from '../../components/ShareModal';
 
@@ -18,19 +28,47 @@ export default function NearbyPage() {
       const user = await ensureAnonAuth();
       setSelfUid(user.uid);
       if (!navigator.geolocation) return;
+
       navigator.geolocation.getCurrentPosition(async pos => {
         const vb = venueBucketFromLatLng(pos.coords.latitude, pos.coords.longitude, 3);
         setBucket(vb);
-        // (Optional) ensure session exists
-        await setDoc(doc(db, 'sessions', user.uid), {
-          uid: user.uid, venueBucket: vb, updatedAt: serverTimestamp()
-        }, { merge: true });
 
-        // subscribe to sessions in same bucket
-        const q = query(collection(db, 'sessions'), where('venueBucket', '==', vb));
+        // set expiry (10 minutes from now)
+        const EXPIRY_MINUTES = 10;
+        const expiresAt = Timestamp.fromDate(
+          new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
+        );
+
+        // create/update own session
+        await setDoc(
+          doc(db, 'sessions', user.uid),
+          {
+            uid: user.uid,
+            venueBucket: vb,
+            updatedAt: serverTimestamp(),
+            expiresAt,
+          },
+          { merge: true }
+        );
+
+        // subscribe to all sessions in the same bucket
+        const q = query(collection(db, 'sessions'));
         const unsub = onSnapshot(q, async snap => {
+          const now = Timestamp.now();
           const uids = [];
-          snap.forEach(d => { if (d.id !== user.uid) uids.push(d.id); });
+
+          snap.forEach(d => {
+            const data = d.data();
+            // same bucket, not self, and not expired
+            if (
+              data.venueBucket === vb &&
+              d.id !== user.uid &&
+              data.expiresAt?.toMillis() > now.toMillis()
+            ) {
+              uids.push(d.id);
+            }
+          });
+
           // fetch profiles
           const results = [];
           for (const uid of uids) {
@@ -39,6 +77,7 @@ export default function NearbyPage() {
           }
           setProfiles(results);
         });
+
         return () => unsub();
       });
     })().catch(console.error);
@@ -51,7 +90,7 @@ export default function NearbyPage() {
       toUid: targetUid,
       venueBucket: bucket,
       status: 'pending',
-      fieldsFrom: fields, // { ig: true/false, phone: true/false, linkedin: true/false }
+      fieldsFrom: fields,
       createdAt: serverTimestamp()
     });
     setOpenShareForUid(null);
@@ -59,19 +98,25 @@ export default function NearbyPage() {
   };
 
   return (
-    <div style={{ display:'grid', gap: 12 }}>
+    <div style={{ display: 'grid', gap: 12 }}>
       <h2>People nearby</h2>
       {!bucket && <div>Detecting your venue…</div>}
-      <div style={{ display:'grid', gap: 12 }}>
+      <div style={{ display: 'grid', gap: 12 }}>
         {profiles.map(p => (
-          <ProfileCard key={p.uid} profile={p} onConnect={() => setOpenShareForUid(p.uid)} />
+          <ProfileCard
+            key={p.uid}
+            profile={p}
+            onConnect={() => setOpenShareForUid(p.uid)}
+          />
         ))}
-        {profiles.length === 0 && bucket && <div>No one here yet. Ask a friend to open the app.</div>}
+        {profiles.length === 0 && bucket && (
+          <div>No one here yet. Ask a friend to open the app.</div>
+        )}
       </div>
       <ShareModal
         open={!!openShareForUid}
         onClose={() => setOpenShareForUid(null)}
-        onSend={(fields) => sendRequest(openShareForUid, fields)}
+        onSend={fields => sendRequest(openShareForUid, fields)}
       />
     </div>
   );
