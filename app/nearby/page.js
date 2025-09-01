@@ -22,6 +22,7 @@ export default function NearbyPage() {
   const [profiles, setProfiles] = useState([]);
   const [selfUid, setSelfUid] = useState(null);
   const [openShareForUid, setOpenShareForUid] = useState(null);
+  const [toast, setToast] = useState(null);
 
   useEffect(() => {
     (async () => {
@@ -85,6 +86,20 @@ export default function NearbyPage() {
 
   const sendRequest = async (targetUid, fields) => {
     const user = await ensureAnonAuth();
+    const selfProfile = await getDoc(doc(db, 'profiles', user.uid));
+    const data = selfProfile.data() || {};
+
+    const hasShareable =
+      data.ig?.trim() || data.phone?.trim() || data.linkedin?.trim();
+
+    if (!hasShareable) {
+      setToast("⚠️ Please add at least one contact method (IG, phone, or LinkedIn) before sending requests.");
+      setTimeout(() => {
+        window.location.href = "/profile";
+      }, 2500); // wait 5s before redirect
+      return;
+    }
+
     await addDoc(collection(db, 'requests'), {
       fromUid: user.uid,
       toUid: targetUid,
@@ -94,7 +109,7 @@ export default function NearbyPage() {
       createdAt: serverTimestamp()
     });
     setOpenShareForUid(null);
-    alert('Request sent! They will choose what to share back.');
+    setToast('✅ Request sent! They will choose what to share back.');
   };
 
   return (
@@ -118,6 +133,26 @@ export default function NearbyPage() {
         onClose={() => setOpenShareForUid(null)}
         onSend={fields => sendRequest(openShareForUid, fields)}
       />
+
+      {/* 🔔 Toast notification */}
+      {toast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#333',
+            color: 'white',
+            padding: '10px 16px',
+            borderRadius: 8,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            zIndex: 1000,
+          }}
+        >
+          {toast}
+        </div>
+      )}
     </div>
   );
 }

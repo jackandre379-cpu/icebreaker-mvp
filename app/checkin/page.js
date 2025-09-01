@@ -5,13 +5,16 @@ import { db, ensureAnonAuth } from '../../lib/firebase';
 import { venueBucketFromLatLng } from '../../lib/venue';
 import {
   doc,
+  getDoc,
   setDoc,
   serverTimestamp,
+  Timestamp
 } from 'firebase/firestore';
 
 export default function CheckInPage() {
   const [bucket, setBucket] = useState(null);
   const [status, setStatus] = useState('');
+  const [toast, setToast] = useState(null);
 
   // ⏰ How long a check-in should last (must match NearbyPage)
   const EXPIRY_MINUTES = 10;
@@ -32,8 +35,26 @@ export default function CheckInPage() {
         setStatus('Signing in...');
         const user = await ensureAnonAuth();
 
+        // 🔑 Check profile before allowing session
+        const profileSnap = await getDoc(doc(db, 'profiles', user.uid));
+        if (!profileSnap.exists() || !profileSnap.data().firstName?.trim()) {
+          setToast('⚠️ Please add your name before checking in.');
+          setStatus('Profile incomplete');
+          setTimeout(() => {
+            window.location.href = '/profile';
+          }, 5000); // wait 5 seconds before redirect
+          return;
+        }
+
+        // Optional recommendation if photo missing
+        if (!profileSnap.data().photoURL) {
+          setToast('💡 Tip: Add a photo so people can recognize you more easily.');
+        }
+
         // set expiry 10 min into the future
-        const expiresAt = new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000);
+        const expiresAt = Timestamp.fromDate(
+          new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
+        );
 
         await setDoc(
           doc(db, 'sessions', user.uid),
@@ -41,7 +62,7 @@ export default function CheckInPage() {
             uid: user.uid,
             venueBucket: vb,
             updatedAt: serverTimestamp(),
-            expiresAt, // ✅ stored as Firestore Timestamp
+            expiresAt,
           },
           { merge: true }
         );
@@ -68,7 +89,7 @@ export default function CheckInPage() {
         const user = await ensureAnonAuth();
         await setDoc(
           doc(db, 'sessions', user.uid),
-          { expiresAt: new Date() }, // ✅ expire immediately
+          { expiresAt: Timestamp.fromDate(new Date()) }, // ✅ expire immediately
           { merge: true }
         );
       } catch (e) {
@@ -101,6 +122,26 @@ export default function CheckInPage() {
       {bucket && (
         <div>
           <b>Venue bucket:</b> {bucket}
+        </div>
+      )}
+
+      {/* 🔔 Toast notification */}
+      {toast && (
+        <div
+          style={{
+            position: 'fixed',
+            bottom: '20px',
+            left: '50%',
+            transform: 'translateX(-50%)',
+            background: '#333',
+            color: 'white',
+            padding: '10px 16px',
+            borderRadius: 8,
+            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
+            zIndex: 1000,
+          }}
+        >
+          {toast}
         </div>
       )}
     </div>
