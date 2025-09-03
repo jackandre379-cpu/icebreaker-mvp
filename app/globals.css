@@ -37,7 +37,6 @@ nav a {
   font-weight: 500;
   font-size: 14px;
   transition: color 0.2s ease;
-  white-space: nowrap; /* ✅ prevent "Check in" wrapping */
 }
 
 nav a:hover {
@@ -74,7 +73,7 @@ footer {
 .page {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: center;  /* ✅ center vertically */
   padding: 40px 20px;
   min-height: calc(100vh - 120px); /* account for header/footer */
   box-sizing: border-box;
@@ -99,11 +98,6 @@ footer {
   color: #2d2d2d;
 }
 
-/* ✅ More breathing room between sections */
-.card h2 {
-  margin: 28px 0 16px;
-}
-
 .card p {
   font-size: 0.95rem;
   line-height: 1.5;
@@ -113,7 +107,7 @@ footer {
 
 /* ========== Home Card ========== */
 .home-card {
-  max-width: 480px;
+  max-width: 480px;   /* ✅ prevent stretching too wide */
   width: 100%;
   text-align: center;
 }
@@ -134,7 +128,7 @@ footer {
 /* ========== Actions & Buttons ========== */
 .actions {
   display: grid;
-  gap: 10px;
+  gap: 10px;  /* ✅ tightened for mobile */
   width: 100%;
 }
 
@@ -271,24 +265,25 @@ footer {
   border: none;
 }
 
-/* ========== Requests list ========== */
+/* Requests list */
 .request-row {
   display: flex;
-  flex-wrap: wrap;
+  flex-wrap: wrap;              /* ✅ allow wrapping on mobile */
   align-items: center;
   justify-content: space-between;
   background: #fff;
   border: 1px solid #eee;
   border-radius: 12px;
   padding: 16px 20px;
-  gap: 12px;
+  gap: 12px;                    /* ✅ space between rows on wrap */
 }
 
 .request-actions {
   display: flex;
   gap: 8px;
-  margin-left: auto;
+  margin-left: auto;            /* ✅ push actions to the right */
 }
+
 
 .request-actions .btn {
   padding: 8px 16px;
@@ -296,16 +291,14 @@ footer {
   border-radius: 9999px;
 }
 
-/* ========== Connections list ========== */
+/* Connections list */
 .connection-row {
   display: flex;
   align-items: center;
-  justify-content: space-between; /* ✅ align like requests */
-  background: #fff;
+  gap: 12px;
   border: 1px solid #eee;
   border-radius: 12px;
-  padding: 16px 20px; /* ✅ consistent with requests */
-  gap: 12px;
+  padding: 20px;
   margin-bottom: 12px;
 }
 
@@ -313,18 +306,12 @@ footer {
   display: flex;
   flex-direction: column;
   line-height: 1.4;
-  gap: 2px; /* ✅ tighter stack */
 }
 
 .connection-name {
   font-size: 1rem;
   font-weight: 600;
   color: #222;
-}
-
-.connection-handle {
-  font-size: 0.85rem;
-  color: #666; /* ✅ softer than name */
 }
 
 /* Pills for IG / Phone / LinkedIn */

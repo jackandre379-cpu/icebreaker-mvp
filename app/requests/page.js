@@ -179,19 +179,20 @@ function FieldsDisplay({ obj }) {
   const pills = [];
 
   if (obj?.ig) {
-    const handle = obj.ig.replace(/^@/, '').trim();
-    pills.push(
-      <a
-        key="ig"
-        href={`https://instagram.com/${handle}`}
-        target="_blank"
-        rel="noreferrer"
-        className="pill"
-      >
-        📸 @{handle}
-      </a>
-    );
-  }
+  const handle = String(obj.ig).replace(/^@/, '').trim();
+  pills.push(
+    <a
+      key="ig"
+      href={`https://instagram.com/${handle}`}
+      target="_blank"
+      rel="noreferrer"
+      className="pill"
+    >
+      📸 @{handle}
+    </a>
+  );
+}
+
 
   if (obj?.phone) {
     pills.push(
