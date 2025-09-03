@@ -108,9 +108,9 @@ export default function RequestsPage() {
   return (
     <div className="page">
       <div className="card">
-        <h2>Requests</h2>
 
-        {/* Incoming requests */}
+        {/* Requests */}
+        <h2>Requests</h2>
         <div className="subcard">
           {incoming.map((req) => (
             <div key={req.id} className="request-row">
@@ -121,14 +121,13 @@ export default function RequestsPage() {
                   size={44}
                 />
                 <div className="profile-text">
-  <div className="profile-name">
-    {req.fromProfile.firstName || 'Someone'}
-  </div>
-  <div className="profile-bio">
-    {req.fromProfile.bio || ''}
-  </div>
-</div>
-
+                  <div className="profile-name">
+                    {req.fromProfile.firstName || 'Someone'}
+                  </div>
+                  <div className="profile-bio">
+                    {req.fromProfile.bio || ''}
+                  </div>
+                </div>
               </div>
 
               <div className="request-actions">
@@ -147,8 +146,8 @@ export default function RequestsPage() {
         </div>
 
         {/* Connections */}
+        <h2>Connections</h2>
         <div className="subcard">
-          <h3>Connections</h3>
           {connections.map((c) => (
             <div key={c.id} className="connection-row">
               <Avatar
@@ -168,6 +167,7 @@ export default function RequestsPage() {
             <div className="empty">No connections yet.</div>
           )}
         </div>
+
       </div>
     </div>
   );
