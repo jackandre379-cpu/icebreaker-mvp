@@ -1,9 +1,20 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { db, ensureAnonAuth, auth, storage } from '../../lib/firebase';
+import { db, ensureAnonAuth, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+
+// Lucide icons
+import { User, FileText, Instagram, Phone, Linkedin } from "lucide-react";
+
+const ICONS = {
+  name: <User size={16} strokeWidth={1.8} />,
+  bio: <FileText size={16} strokeWidth={1.8} />,
+  ig: <Instagram size={16} strokeWidth={1.8} />,
+  phone: <Phone size={16} strokeWidth={1.8} />,
+  linkedin: <Linkedin size={16} strokeWidth={1.8} />,
+};
 
 export default function ProfilePage() {
   const [firstName, setFirstName] = useState('');
@@ -14,11 +25,10 @@ export default function ProfilePage() {
   const [photoURL, setPhotoURL] = useState('');
   const [status, setStatus] = useState('');
 
-  // Load existing profile
+  // Load profile
   useEffect(() => {
     (async () => {
       const user = await ensureAnonAuth();
-      console.log("🔑 Signed in as:", user?.uid);
       const snap = await getDoc(doc(db, 'profiles', user.uid));
       if (snap.exists()) {
         const d = snap.data();
@@ -39,15 +49,13 @@ export default function ProfilePage() {
       { firstName, bio, ig, phone, linkedin, photoURL },
       { merge: true }
     );
-    setStatus('Saved!');
-    setTimeout(() => setStatus(''), 2000);
+    setStatus('✅ Profile saved!');
+    setTimeout(() => setStatus(''), 2500);
   };
 
   const uploadPhoto = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Guards
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file.');
       return;
@@ -57,77 +65,116 @@ export default function ProfilePage() {
       return;
     }
 
-    setStatus('Uploading photo…');
+    setStatus('📤 Uploading...');
     try {
       const user = await ensureAnonAuth();
-      console.log("📤 Uploading as UID:", user?.uid, "Bucket:", storage.app.options.storageBucket);
-
       const key = `userPhotos/${user.uid}/${Date.now()}-${file.name}`;
       const storageRef = ref(storage, key);
 
       await uploadBytes(storageRef, file);
       const url = await getDownloadURL(storageRef);
 
-      console.log("✅ Uploaded:", url);
-      setPhotoURL(url); // show immediately
+      setPhotoURL(url);
       await setDoc(doc(db, 'profiles', user.uid), { photoURL: url }, { merge: true });
-      setStatus('Photo updated!');
+      setStatus('✅ Photo updated!');
     } catch (err) {
       console.error('❌ Upload failed:', err);
       alert(`Upload failed: ${err?.code || ''} ${err?.message || err}`);
     } finally {
-      setTimeout(() => setStatus(''), 2000);
+      setTimeout(() => setStatus(''), 2500);
     }
   };
 
   return (
-    <div style={{ display: 'grid', gap: 10, maxWidth: 520 }}>
-      <h2>My Profile</h2>
+    <div className="page">
+      <div className="card profile-card">
+        <h2 className="profile-title">My Profile</h2>
 
-      <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-        <AvatarPreview photoURL={photoURL} firstName={firstName} size={84} />
-        <label style={{ fontSize: 14 }}>
-          <div style={{ marginBottom: 6, fontWeight: 600 }}>Profile photo</div>
-          <input type="file" accept="image/*" onChange={uploadPhoto} />
-          <div style={{ fontSize: 12, color: '#666', marginTop: 4 }}>
-            JPG/PNG, &lt; 5 MB
+        {/* Avatar upload */}
+        <div className="avatar-row">
+          <AvatarPreview photoURL={photoURL} firstName={firstName} size={84} />
+          <div className="upload-box">
+            <label className="upload-btn">
+              Upload new photo
+              <input type="file" accept="image/*" onChange={uploadPhoto} hidden />
+            </label>
+            <span className="upload-hint">JPG/PNG, &lt; 5MB</span>
           </div>
-        </label>
+        </div>
+
+        {/* Form */}
+        <div className="profile-form">
+          <div className="profile-form-row">
+            <label className="profile-label">First name</label>
+            <div className="input-wrapper">
+              <span className="icon">{ICONS.name}</span>
+              <input
+                className="profile-input"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
+                placeholder="Enter your name"
+              />
+            </div>
+          </div>
+
+          <div className="profile-form-row">
+            <label className="profile-label">Short bio</label>
+            <div className="input-wrapper">
+              <span className="icon">{ICONS.bio}</span>
+              <textarea
+                className="profile-textarea"
+                value={bio}
+                onChange={(e) => setBio(e.target.value)}
+                placeholder="Tell people a little about you..."
+              />
+            </div>
+          </div>
+
+          <div className="profile-form-row">
+            <label className="profile-label">Instagram</label>
+            <div className="input-wrapper">
+              <span className="icon">{ICONS.ig}</span>
+              <input
+                className="profile-input"
+                value={ig}
+                onChange={(e) => setIg(e.target.value)}
+                placeholder="@yourhandle"
+              />
+            </div>
+          </div>
+
+          <div className="profile-form-row">
+            <label className="profile-label">Phone</label>
+            <div className="input-wrapper">
+              <span className="icon">{ICONS.phone}</span>
+              <input
+                className="profile-input"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                placeholder="+212..."
+              />
+            </div>
+          </div>
+
+          <div className="profile-form-row">
+            <label className="profile-label">LinkedIn</label>
+            <div className="input-wrapper">
+              <span className="icon">{ICONS.linkedin}</span>
+              <input
+                className="profile-input"
+                value={linkedin}
+                onChange={(e) => setLinkedin(e.target.value)}
+                placeholder="https://linkedin.com/in/..."
+              />
+            </div>
+          </div>
+        </div>
+
+<div className="profile-actions">
+  <button className="btn primary" onClick={save}>Save changes</button>
+</div>
+        {status && <div className="status">{status}</div>}
       </div>
-
-      <label>
-        First name
-        <input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
-      </label>
-
-      <label>
-        Short bio
-        <input value={bio} onChange={(e) => setBio(e.target.value)} />
-      </label>
-
-      <label>
-        Instagram
-        <input value={ig} onChange={(e) => setIg(e.target.value)} placeholder="@yourhandle" />
-      </label>
-
-      <label>
-        Phone
-        <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+212..." />
-      </label>
-
-      <label>
-        LinkedIn
-        <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="https://linkedin.com/in/..." />
-      </label>
-
-      <button
-        onClick={save}
-        style={{ background: 'black', color: 'white', padding: '8px 14px', borderRadius: 10, width: 'fit-content' }}
-      >
-        Save
-      </button>
-
-      {status && <div style={{ color: 'green' }}>{status}</div>}
     </div>
   );
 }
@@ -141,22 +188,14 @@ function AvatarPreview({ photoURL, firstName, size = 60 }) {
         alt="Profile"
         width={size}
         height={size}
-        style={{ borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+        className="avatar"
       />
     );
   }
   return (
     <div
-      style={{
-        width: size,
-        height: size,
-        borderRadius: '50%',
-        background: '#eee',
-        display: 'grid',
-        placeItems: 'center',
-        fontWeight: 700
-      }}
-      aria-label="No profile photo"
+      className="avatar placeholder"
+      style={{ width: size, height: size, fontSize: size * 0.4 }}
     >
       {initials}
     </div>

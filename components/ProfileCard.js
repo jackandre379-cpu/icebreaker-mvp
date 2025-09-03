@@ -7,32 +7,16 @@ export default function ProfileCard({ profile, onConnect }) {
   const initials = (firstName?.trim()?.[0] || '?').toUpperCase();
 
   return (
-    <div
-      style={{
-        border: '1px solid #eee',
-        borderRadius: 12,
-        padding: 12,
-        display: 'grid',
-        gridTemplateColumns: '56px 1fr auto',
-        gap: 12,
-        alignItems: 'center'
-      }}
-    >
-      <Avatar photoURL={photoURL} initials={initials} />
-      <div style={{ display: 'grid', gap: 4 }}>
-        <div style={{ fontWeight: 700 }}>{firstName}</div>
-        {bio && <div style={{ fontSize: 12, color: '#666' }}>{bio}</div>}
+    <div className="profile-row">
+      <div className="profile-info">
+        <Avatar photoURL={photoURL} initials={initials} />
+        <div className="profile-text">
+          <div className="profile-name">{firstName}</div>
+          {bio && <div className="profile-bio">{bio}</div>}
+        </div>
       </div>
-      <button
-        onClick={onConnect}
-        style={{
-          padding: '8px 10px',
-          borderRadius: 8,
-          background: 'black',
-          color: 'white',
-          whiteSpace: 'nowrap'
-        }}
-      >
+
+      <button onClick={onConnect} className="btn primary">
         Connect
       </button>
     </div>
@@ -45,26 +29,13 @@ function Avatar({ photoURL, initials }) {
       <img
         src={photoURL}
         alt="Profile"
-        width={56}
-        height={56}
-        style={{ borderRadius: '50%', objectFit: 'cover', display: 'block' }}
+        className="profile-photo"
       />
     );
   }
   return (
-    <div
-      style={{
-        width: 56,
-        height: 56,
-        borderRadius: '50%',
-        background: '#eee',
-        display: 'grid',
-        placeItems: 'center',
-        fontWeight: 700
-      }}
-      aria-label="No profile photo"
-    >
-      {initials}
+    <div className="profile-photo" aria-label="No profile photo">
+      <span style={{ fontWeight: 700 }}>{initials}</span>
     </div>
   );
 }

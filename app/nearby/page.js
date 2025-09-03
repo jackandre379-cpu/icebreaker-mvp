@@ -34,13 +34,11 @@ export default function NearbyPage() {
         const vb = venueBucketFromLatLng(pos.coords.latitude, pos.coords.longitude, 3);
         setBucket(vb);
 
-        // set expiry (10 minutes from now)
         const EXPIRY_MINUTES = 10;
         const expiresAt = Timestamp.fromDate(
           new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
         );
 
-        // create/update own session
         await setDoc(
           doc(db, 'sessions', user.uid),
           {
@@ -52,7 +50,6 @@ export default function NearbyPage() {
           { merge: true }
         );
 
-        // subscribe to all sessions in the same bucket
         const q = query(collection(db, 'sessions'));
         const unsub = onSnapshot(q, async snap => {
           const now = Timestamp.now();
@@ -60,7 +57,6 @@ export default function NearbyPage() {
 
           snap.forEach(d => {
             const data = d.data();
-            // same bucket, not self, and not expired
             if (
               data.venueBucket === vb &&
               d.id !== user.uid &&
@@ -70,7 +66,6 @@ export default function NearbyPage() {
             }
           });
 
-          // fetch profiles
           const results = [];
           for (const uid of uids) {
             const p = await getDoc(doc(db, 'profiles', uid));
@@ -96,7 +91,7 @@ export default function NearbyPage() {
       setToast("⚠️ Please add at least one contact method (IG, phone, or LinkedIn) before sending requests.");
       setTimeout(() => {
         window.location.href = "/profile";
-      }, 2500); // wait 5s before redirect
+      }, 2500);
       return;
     }
 
@@ -113,46 +108,33 @@ export default function NearbyPage() {
   };
 
   return (
-    <div style={{ display: 'grid', gap: 12 }}>
-      <h2>People nearby</h2>
-      {!bucket && <div>Detecting your venue…</div>}
-      <div style={{ display: 'grid', gap: 12 }}>
-        {profiles.map(p => (
-          <ProfileCard
-            key={p.uid}
-            profile={p}
-            onConnect={() => setOpenShareForUid(p.uid)}
-          />
-        ))}
-        {profiles.length === 0 && bucket && (
-          <div>No one here yet. Ask a friend to open the app.</div>
-        )}
+    <div className="page">
+      <div className="card">
+        <h2>People nearby</h2>
+        {!bucket && <div className="empty">Detecting your venue…</div>}
+
+        <div className="list">
+          {profiles.map(p => (
+            <ProfileCard
+              key={p.uid}
+              profile={p}
+              onConnect={() => setOpenShareForUid(p.uid)}
+            />
+          ))}
+
+          {profiles.length === 0 && bucket && (
+            <div className="empty">No one here yet. Ask a friend to open the app.</div>
+          )}
+        </div>
       </div>
+
       <ShareModal
         open={!!openShareForUid}
         onClose={() => setOpenShareForUid(null)}
         onSend={fields => sendRequest(openShareForUid, fields)}
       />
 
-      {/* 🔔 Toast notification */}
-      {toast && (
-        <div
-          style={{
-            position: 'fixed',
-            bottom: '20px',
-            left: '50%',
-            transform: 'translateX(-50%)',
-            background: '#333',
-            color: 'white',
-            padding: '10px 16px',
-            borderRadius: 8,
-            boxShadow: '0 4px 12px rgba(0,0,0,0.3)',
-            zIndex: 1000,
-          }}
-        >
-          {toast}
-        </div>
-      )}
+      {toast && <div className="toast">{toast}</div>}
     </div>
   );
 }
