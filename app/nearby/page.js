@@ -109,11 +109,10 @@ export default function NearbyPage() {
 
   return (
     <>
-      {/* ✅ Same header style as Check In / Profile */}
       <div className="page-header">Nearby People</div>
 
       <div className="page">
-        <div className="card">
+        <div className="list">
           {!bucket && <div className="empty">Detecting your venue…</div>}
 
           {profiles.map((p, i) => (
@@ -121,7 +120,6 @@ export default function NearbyPage() {
               key={p.uid}
               profile={p}
               onConnect={() => setOpenShareForUid(p.uid)}
-              isLast={i === profiles.length - 1}
             />
           ))}
 

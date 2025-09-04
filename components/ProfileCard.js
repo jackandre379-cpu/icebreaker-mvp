@@ -1,13 +1,13 @@
 'use client';
 
-export default function ProfileCard({ profile, onConnect, isLast }) {
+export default function ProfileCard({ profile, onConnect }) {
   const firstName = profile.firstName || 'Anonymous';
   const bio = profile.bio || '';
   const photoURL = profile.photoURL || '';
   const initials = (firstName?.trim()?.[0] || '?').toUpperCase();
 
   return (
-    <div className={`profile-row ${isLast ? 'last' : ''}`}>
+    <div className="profile-row">
       <Avatar photoURL={photoURL} initials={initials} />
       <div className="profile-text">
         <div className="profile-name">{firstName}</div>
