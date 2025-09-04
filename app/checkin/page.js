@@ -94,27 +94,32 @@ export default function CheckInPage() {
   }, []);
 
   return (
-    <div className="page">
-      <div className="card">
-        <h2>Check in</h2>
-        <p>We store only a coarse venue bucket, not your exact location.</p>
+    <>
+      {/* ✅ Page header */}
+      <div className="page-header">Check In</div>
 
-        <button onClick={checkIn} className="btn primary">
-          Re-check in
-        </button>
+      <div className="page">
+        <div className="card">
+          <h2>Check in</h2>
+          <p>We store only a coarse venue bucket, not your exact location.</p>
 
-        <div className="status">
-          <b>Status:</b> {status}
+          <button onClick={checkIn} className="btn">
+            Re-check in
+          </button>
+
+          <div className="status">
+            <b>Status:</b> {status}
+          </div>
+
+          {bucket && (
+            <div className="status">
+              <b>Venue bucket:</b> {bucket}
+            </div>
+          )}
         </div>
 
-        {bucket && (
-          <div className="status">
-            <b>Venue bucket:</b> {bucket}
-          </div>
-        )}
+        {toast && <div className="toast">{toast}</div>}
       </div>
-
-      {toast && <div className="toast">{toast}</div>}
-    </div>
+    </>
   );
 }

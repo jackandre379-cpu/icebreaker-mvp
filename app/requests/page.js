@@ -106,70 +106,72 @@ export default function RequestsPage() {
   };
 
   return (
-    <div className="page">
-      <div className="card">
+    <>
+      <div className="page-header">Connections & Requests</div>
+      <div className="requests-page">
 
         {/* Requests */}
-        <h2>Requests</h2>
-        <div className="subcard">
-          {incoming.map((req) => (
-            <div key={req.id} className="request-row">
-              <div className="profile-info">
+        <section>
+          <h2>Connection Requests</h2>
+          <div className="requests-grid">
+            {incoming.map((req) => (
+              <div key={req.id} className="requests-card">
                 <Avatar
                   photoURL={req.fromProfile.photoURL}
                   firstName={req.fromProfile.firstName}
-                  size={44}
+                  size={64}
                 />
-                <div className="profile-text">
-                  <div className="profile-name">
-                    {req.fromProfile.firstName || 'Someone'}
-                  </div>
-                  <div className="profile-bio">
-                    {req.fromProfile.bio || ''}
-                  </div>
+                <div className="requests-info">
+                  <h3>{req.fromProfile.firstName || 'Someone'}</h3>
+                  <p>{req.fromProfile.bio || ''}</p>
+                </div>
+                <div className="requests-actions">
+                  <button
+                    className="btn accept"
+                    onClick={() => act(req, 'accepted')}
+                  >
+                    Accept
+                  </button>
+                  <button
+                    className="btn decline"
+                    onClick={() => act(req, 'declined')}
+                  >
+                    Decline
+                  </button>
                 </div>
               </div>
-
-              <div className="request-actions">
-                <button className="btn" onClick={() => act(req, 'declined')}>
-                  Not now
-                </button>
-                <button className="btn primary" onClick={() => act(req, 'accepted')}>
-                  Accept
-                </button>
-              </div>
-            </div>
-          ))}
-          {incoming.length === 0 && (
-            <div className="empty">No pending requests.</div>
-          )}
-        </div>
+            ))}
+            {incoming.length === 0 && (
+              <div className="empty">No pending requests.</div>
+            )}
+          </div>
+        </section>
 
         {/* Connections */}
-        <h2>Connections</h2>
-        <div className="subcard">
-          {connections.map((c) => (
-            <div key={c.id} className="connection-row">
-              <Avatar
-                photoURL={c.otherProfile.photoURL}
-                firstName={c.otherProfile.firstName}
-                size={44}
-              />
-              <div className="connection-info">
-                <div className="connection-name">
-                  {c.otherProfile.firstName || 'Someone'}
+        <section>
+          <h2>Connected People</h2>
+          <div className="requests-grid">
+            {connections.map((c) => (
+              <div key={c.id} className="requests-card">
+                <Avatar
+                  photoURL={c.otherProfile.photoURL}
+                  firstName={c.otherProfile.firstName}
+                  size={64}
+                />
+                <div className="requests-info">
+                  <h3>{c.otherProfile.firstName || 'Someone'}</h3>
+                  <FieldsDisplay obj={c.fieldsAtoB} />
                 </div>
-                <FieldsDisplay obj={c.fieldsAtoB} />
               </div>
-            </div>
-          ))}
-          {connections.length === 0 && (
-            <div className="empty">No connections yet.</div>
-          )}
-        </div>
+            ))}
+            {connections.length === 0 && (
+              <div className="empty">No connections yet.</div>
+            )}
+          </div>
+        </section>
 
       </div>
-    </div>
+    </>
   );
 }
 
@@ -179,20 +181,19 @@ function FieldsDisplay({ obj }) {
   const pills = [];
 
   if (obj?.ig) {
-  const handle = String(obj.ig).replace(/^@/, '').trim();
-  pills.push(
-    <a
-      key="ig"
-      href={`https://instagram.com/${handle}`}
-      target="_blank"
-      rel="noreferrer"
-      className="pill"
-    >
-      📸 @{handle}
-    </a>
-  );
-}
-
+    const handle = String(obj.ig).replace(/^@/, '').trim();
+    pills.push(
+      <a
+        key="ig"
+        href={`https://instagram.com/${handle}`}
+        target="_blank"
+        rel="noreferrer"
+        className="pill"
+      >
+        📸 @{handle}
+      </a>
+    );
+  }
 
   if (obj?.phone) {
     pills.push(
@@ -219,7 +220,7 @@ function FieldsDisplay({ obj }) {
   return pills.length ? <div className="pills">{pills}</div> : null;
 }
 
-function Avatar({ photoURL, firstName, size = 44 }) {
+function Avatar({ photoURL, firstName, size = 64 }) {
   const initials = (firstName?.trim()?.[0] || '?').toUpperCase();
   if (photoURL) {
     return (

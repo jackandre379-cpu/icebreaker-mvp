@@ -4,9 +4,11 @@ import Link from 'next/link';
 import { useEffect, useState } from 'react';
 import { db, ensureAnonAuth } from '../lib/firebase';
 import { collection, query, where, onSnapshot } from 'firebase/firestore';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
   const [count, setCount] = useState(0);
+  const pathname = usePathname();
 
   useEffect(() => {
     (async () => {
@@ -23,14 +25,21 @@ export default function Navbar() {
     })().catch(console.error);
   }, []);
 
-  return (
-    <nav style={{ display: 'flex', gap: 12 }}>
-      <Link href="/checkin">Check in</Link>
-      <Link href="/nearby">Nearby</Link>
-      <Link href="/requests">
-        Requests {count > 0 && <span style={{ color: 'red' }}>({count})</span>}
-      </Link>
-      <Link href="/profile">Profile</Link>
-    </nav>
-  );
+ return (
+  <nav className="bottom-nav">
+    <Link href="/profile" className={pathname === '/profile' ? 'active' : ''}>
+      Profile
+    </Link>
+    <Link href="/checkin" className={pathname === '/checkin' ? 'active' : ''}>
+      Check In
+    </Link>
+    <Link href="/nearby" className={pathname === '/nearby' ? 'active' : ''}>
+      Nearby
+    </Link>
+    <Link href="/requests" className={pathname === '/requests' ? 'active' : ''}>
+      Requests {count > 0 && <span style={{ color: 'red' }}>({count})</span>}
+    </Link>
+  </nav>
+);
+
 }

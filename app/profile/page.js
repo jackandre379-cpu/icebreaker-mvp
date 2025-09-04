@@ -5,17 +5,6 @@ import { db, ensureAnonAuth, storage } from '../../lib/firebase';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
-// Lucide icons
-import { User, FileText, Instagram, Phone, Linkedin } from "lucide-react";
-
-const ICONS = {
-  name: <User size={16} strokeWidth={1.8} />,
-  bio: <FileText size={16} strokeWidth={1.8} />,
-  ig: <Instagram size={16} strokeWidth={1.8} />,
-  phone: <Phone size={16} strokeWidth={1.8} />,
-  linkedin: <Linkedin size={16} strokeWidth={1.8} />,
-};
-
 export default function ProfilePage() {
   const [firstName, setFirstName] = useState('');
   const [bio, setBio] = useState('');
@@ -42,6 +31,7 @@ export default function ProfilePage() {
     })().catch(console.error);
   }, []);
 
+  // Save
   const save = async () => {
     const user = await ensureAnonAuth();
     await setDoc(
@@ -53,9 +43,11 @@ export default function ProfilePage() {
     setTimeout(() => setStatus(''), 2500);
   };
 
+  // Upload
   const uploadPhoto = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
+
     if (!file.type.startsWith('image/')) {
       alert('Please select an image file.');
       return;
@@ -86,99 +78,65 @@ export default function ProfilePage() {
   };
 
   return (
-    <div className="page">
-      <div className="card profile-card">
-        <h2 className="profile-title">My Profile</h2>
+    <>
+      {/* ✅ Page header at the top */}
+      <div className="page-header">My Profile</div>
 
-        {/* Avatar upload */}
-        <div className="avatar-row">
-          <AvatarPreview photoURL={photoURL} firstName={firstName} size={84} />
-          <div className="upload-box">
+      <div className="page">
+        <div className="card">
+          {/* Avatar */}
+          <AvatarPreview photoURL={photoURL} firstName={firstName} size={96} />
+
+          {/* Name + Bio preview */}
+          <h2 style={{ marginTop: "12px", marginBottom: "4px" }}>
+            {firstName || "John Doe"}
+          </h2>
+          {bio && <p style={{ marginBottom: "20px" }}>{bio}</p>}
+
+          {/* Upload photo button */}
+          <div className="form-group" style={{ textAlign: "center" }}>
             <label className="upload-btn">
               Upload new photo
               <input type="file" accept="image/*" onChange={uploadPhoto} hidden />
             </label>
-            <span className="upload-hint">JPG/PNG, &lt; 5MB</span>
           </div>
+
+          {/* Form fields */}
+          <div className="form-group">
+            <label>Name</label>
+            <input value={firstName} onChange={(e) => setFirstName(e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label>Bio</label>
+            <textarea value={bio} onChange={(e) => setBio(e.target.value)} />
+          </div>
+
+          <div className="form-group">
+            <label>Instagram</label>
+            <input value={ig} onChange={(e) => setIg(e.target.value)} placeholder="@username" />
+          </div>
+
+          <div className="form-group">
+            <label>LinkedIn</label>
+            <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" />
+          </div>
+
+          <div className="form-group">
+            <label>Phone</label>
+            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+123456789" />
+          </div>
+
+          {/* Save button */}
+          <button className="btn" onClick={save}>Save Profile</button>
+          {status && <div className="status">{status}</div>}
         </div>
-
-        {/* Form */}
-        <div className="profile-form">
-          <div className="profile-form-row">
-            <label className="profile-label">First name</label>
-            <div className="input-wrapper">
-              <span className="icon">{ICONS.name}</span>
-              <input
-                className="profile-input"
-                value={firstName}
-                onChange={(e) => setFirstName(e.target.value)}
-                placeholder="Enter your name"
-              />
-            </div>
-          </div>
-
-          <div className="profile-form-row">
-            <label className="profile-label">Short bio</label>
-            <div className="input-wrapper">
-              <span className="icon">{ICONS.bio}</span>
-              <textarea
-                className="profile-textarea"
-                value={bio}
-                onChange={(e) => setBio(e.target.value)}
-                placeholder="Tell people a little about you..."
-              />
-            </div>
-          </div>
-
-          <div className="profile-form-row">
-            <label className="profile-label">Instagram</label>
-            <div className="input-wrapper">
-              <span className="icon">{ICONS.ig}</span>
-              <input
-                className="profile-input"
-                value={ig}
-                onChange={(e) => setIg(e.target.value)}
-                placeholder="@yourhandle"
-              />
-            </div>
-          </div>
-
-          <div className="profile-form-row">
-            <label className="profile-label">Phone</label>
-            <div className="input-wrapper">
-              <span className="icon">{ICONS.phone}</span>
-              <input
-                className="profile-input"
-                value={phone}
-                onChange={(e) => setPhone(e.target.value)}
-                placeholder="+212..."
-              />
-            </div>
-          </div>
-
-          <div className="profile-form-row">
-            <label className="profile-label">LinkedIn</label>
-            <div className="input-wrapper">
-              <span className="icon">{ICONS.linkedin}</span>
-              <input
-                className="profile-input"
-                value={linkedin}
-                onChange={(e) => setLinkedin(e.target.value)}
-                placeholder="https://linkedin.com/in/..."
-              />
-            </div>
-          </div>
-        </div>
-
-<div className="profile-actions">
-  <button className="btn primary" onClick={save}>Save changes</button>
-</div>
-        {status && <div className="status">{status}</div>}
       </div>
-    </div>
+    </>
   );
 }
 
+// Avatar component
 function AvatarPreview({ photoURL, firstName, size = 60 }) {
   const initials = (firstName?.trim()?.[0] || '?').toUpperCase();
   if (photoURL) {
@@ -195,7 +153,17 @@ function AvatarPreview({ photoURL, firstName, size = 60 }) {
   return (
     <div
       className="avatar placeholder"
-      style={{ width: size, height: size, fontSize: size * 0.4 }}
+      style={{
+        width: size,
+        height: size,
+        fontSize: size * 0.4,
+        display: "grid",
+        placeItems: "center",
+        borderRadius: "50%",
+        background: "#eee",
+        fontWeight: "700",
+        color: "#555",
+      }}
     >
       {initials}
     </div>

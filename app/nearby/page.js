@@ -108,17 +108,20 @@ export default function NearbyPage() {
   };
 
   return (
-    <div className="page">
-      <div className="card">
-        <h2>People nearby</h2>
-        {!bucket && <div className="empty">Detecting your venue…</div>}
+    <>
+      {/* ✅ Same header style as Check In / Profile */}
+      <div className="page-header">Nearby People</div>
 
-        <div className="list">
-          {profiles.map(p => (
+      <div className="page">
+        <div className="card">
+          {!bucket && <div className="empty">Detecting your venue…</div>}
+
+          {profiles.map((p, i) => (
             <ProfileCard
               key={p.uid}
               profile={p}
               onConnect={() => setOpenShareForUid(p.uid)}
+              isLast={i === profiles.length - 1}
             />
           ))}
 
@@ -126,15 +129,15 @@ export default function NearbyPage() {
             <div className="empty">No one here yet. Ask a friend to open the app.</div>
           )}
         </div>
+
+        {toast && <div className="toast">{toast}</div>}
       </div>
 
       <ShareModal
         open={!!openShareForUid}
         onClose={() => setOpenShareForUid(null)}
-        onSend={fields => sendRequest(openShareForUid, fields)}
+        onSend={(fields) => sendRequest(openShareForUid, fields)}
       />
-
-      {toast && <div className="toast">{toast}</div>}
-    </div>
+    </>
   );
 }
