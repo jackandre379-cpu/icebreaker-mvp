@@ -19,11 +19,14 @@ import {
 export default function RequestsPage() {
   const [incoming, setIncoming] = useState([]);
   const [connections, setConnections] = useState([]);
+  const [me, setMe] = useState(null);
 
   // Subscribe to incoming requests
   useEffect(() => {
     (async () => {
       const user = await ensureAnonAuth();
+      setMe(user);
+
       const q = query(
         collection(db, 'requests'),
         where('toUid', '==', user.uid),
@@ -49,6 +52,7 @@ export default function RequestsPage() {
   useEffect(() => {
     (async () => {
       const user = await ensureAnonAuth();
+      setMe(user);
 
       const handleSnap = async (snap, key) => {
         const items = [];
@@ -82,6 +86,8 @@ export default function RequestsPage() {
 
   // Accept / decline request
   const act = async (req, decision) => {
+    const user = await ensureAnonAuth();
+
     if (decision === 'declined') {
       await updateDoc(doc(db, 'requests', req.id), {
         status: 'declined',
@@ -90,12 +96,30 @@ export default function RequestsPage() {
       return;
     }
 
-    // accepted → create connection
+    // Get both profiles
+    const fromProfileSnap = await getDoc(doc(db, 'profiles', req.fromUid));
+    const fromProfile = fromProfileSnap.exists() ? fromProfileSnap.data() : {};
+    const toProfileSnap = await getDoc(doc(db, 'profiles', req.toUid));
+    const toProfile = toProfileSnap.exists() ? toProfileSnap.data() : {};
+
+    // Build fields each side shared
+    const fieldsAtoB = {};
+    if (req.fieldsFrom?.ig && fromProfile.ig) fieldsAtoB.ig = fromProfile.ig;
+    if (req.fieldsFrom?.phone && fromProfile.phone) fieldsAtoB.phone = fromProfile.phone;
+    if (req.fieldsFrom?.linkedin && fromProfile.linkedin) fieldsAtoB.linkedin = fromProfile.linkedin;
+
+    const fieldsBtoA = {};
+    if (req.fieldsTo?.ig && toProfile.ig) fieldsBtoA.ig = toProfile.ig;
+    if (req.fieldsTo?.phone && toProfile.phone) fieldsBtoA.phone = toProfile.phone;
+    if (req.fieldsTo?.linkedin && toProfile.linkedin) fieldsBtoA.linkedin = toProfile.linkedin;
+
+    // Save connection with both directions
     await addDoc(collection(db, 'connections'), {
       aUid: req.fromUid,
       bUid: req.toUid,
       venueBucket: req.venueBucket,
-      fieldsAtoB: req.fieldsFrom,
+      fieldsAtoB, // what sender shared with receiver
+      fieldsBtoA, // what receiver shared with sender
       createdAt: serverTimestamp()
     });
 
@@ -146,29 +170,29 @@ export default function RequestsPage() {
             )}
           </div>
         </section>
+{/* Connections */}
+<section>
+  <h2>Connected People</h2>
+  <div className="requests-grid">
+    {connections.map((c) => (
+      <div key={c.id} className="requests-card">
+        <Avatar
+          photoURL={c.otherProfile.photoURL}
+          firstName={c.otherProfile.firstName}
+          size={64}
+        />
+        <div className="requests-info">
+          <h3>{c.otherProfile.firstName || 'Someone'}</h3>
+          <FieldsDisplay obj={c.otherProfile} />  {/* ✅ Show real profile fields */}
+        </div>
+      </div>
+    ))}
+    {connections.length === 0 && (
+      <div className="empty">No connections yet.</div>
+    )}
+  </div>
+</section>
 
-        {/* Connections */}
-        <section>
-          <h2>Connected People</h2>
-          <div className="requests-grid">
-            {connections.map((c) => (
-              <div key={c.id} className="requests-card">
-                <Avatar
-                  photoURL={c.otherProfile.photoURL}
-                  firstName={c.otherProfile.firstName}
-                  size={64}
-                />
-                <div className="requests-info">
-                  <h3>{c.otherProfile.firstName || 'Someone'}</h3>
-                  <FieldsDisplay obj={c.fieldsAtoB} />
-                </div>
-              </div>
-            ))}
-            {connections.length === 0 && (
-              <div className="empty">No connections yet.</div>
-            )}
-          </div>
-        </section>
 
       </div>
     </>
@@ -180,8 +204,8 @@ export default function RequestsPage() {
 function FieldsDisplay({ obj }) {
   const pills = [];
 
-  if (obj?.ig) {
-    const handle = String(obj.ig).replace(/^@/, '').trim();
+  if (obj?.ig && typeof obj.ig === 'string') {
+    const handle = obj.ig.replace(/^@/, '').trim();
     pills.push(
       <a
         key="ig"
@@ -195,7 +219,7 @@ function FieldsDisplay({ obj }) {
     );
   }
 
-  if (obj?.phone) {
+  if (obj?.phone && typeof obj.phone === 'string') {
     pills.push(
       <span key="phone" className="pill">
         📱 {obj.phone}
@@ -203,7 +227,7 @@ function FieldsDisplay({ obj }) {
     );
   }
 
-  if (obj?.linkedin) {
+  if (obj?.linkedin && typeof obj.linkedin === 'string') {
     pills.push(
       <a
         key="li"
