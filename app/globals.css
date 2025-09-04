@@ -54,20 +54,23 @@ main {
   overflow: hidden;
 }
 
-/* Avatar (large, used in profile page) */
+/* ✅ Avatar (unified for both photo & initials) */
 .avatar {
+  width: 56px;
+  height: 56px;
   border-radius: 50%;
-  object-fit: cover;
-  margin: 0 auto 12px;
-  display: block;
-}
-.avatar.placeholder {
-  background: #eee;
-  display: grid;
-  place-items: center;
+  flex-shrink: 0;
+  margin-right: 12px;
+  background-size: cover;
+  background-position: center;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   font-weight: 700;
-  color: #555;
-  border-radius: 50%;
+  font-size: 20px;
+  color: #fff;
+  background-color: #ccc; /* fallback gray */
+  text-transform: uppercase;
 }
 
 /* Hide raw file input */
@@ -293,14 +296,6 @@ textarea {
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
-.profile-row img.avatar {
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  object-fit: cover;
-  margin-right: 12px;
-}
-
 .profile-text {
   flex: 1;
   margin-right: 12px;
@@ -350,12 +345,11 @@ textarea {
   box-shadow: 0 4px 12px rgba(0,0,0,.04);
 }
 
-.requests-card img {
+.requests-card .avatar {
   width: 64px;
   height: 64px;
-  border-radius: 50%;
-  object-fit: cover;
-  flex-shrink: 0;
+  margin: 0;
+  font-size: 24px;
 }
 
 .requests-info {
@@ -397,7 +391,7 @@ textarea {
   .page { padding: 16px; }
   .card { padding: 16px; }
   .profile-row { padding: 12px; }
-  .profile-row img.avatar { width: 48px; height: 48px; }
+  .avatar { width: 48px; height: 48px; font-size: 18px; }
   .profile-name { font-size: 15px; }
   .profile-bio { font-size: 13px; }
   .btn { font-size: 14px; padding: 10px 14px; }

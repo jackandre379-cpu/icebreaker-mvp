@@ -89,7 +89,7 @@ export default function ProfilePage() {
 
           {/* Name + Bio preview */}
           <h2 style={{ marginTop: "12px", marginBottom: "4px" }}>
-            {firstName || "John Doe"}
+            {firstName || "Name"}
           </h2>
           {bio && <p style={{ marginBottom: "20px" }}>{bio}</p>}
 

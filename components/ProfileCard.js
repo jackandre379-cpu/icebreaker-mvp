@@ -19,8 +19,12 @@ export default function ProfileCard({ profile, onConnect }) {
 }
 
 function Avatar({ photoURL, initials }) {
-  if (photoURL) {
-    return <img src={photoURL} alt="Profile" className="avatar" />;
-  }
-  return <div className="avatar placeholder">{initials}</div>;
+  return (
+    <div
+      className="avatar"
+      style={photoURL ? { backgroundImage: `url(${photoURL})` } : {}}
+    >
+      {!photoURL && initials}
+    </div>
+  );
 }
