@@ -131,7 +131,7 @@ export default function ProfilePage() {
 
           {/* ✅ Privacy footer inside card */}
           <div className="privacy-bar">
-            <a href="#">
+            <a href="/privacy-policy">
               Privacy-first: session-based presence, no exact GPS stored.
             </a>
           </div>

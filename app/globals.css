@@ -11,7 +11,7 @@ html, body {
 
 main {
   flex: 1;
-  padding-bottom: 120px; /* leaves room for nav + privacy bar */
+  padding-bottom: 0; /* ✅ was 120px — removed for better centering */
   box-sizing: border-box;
 }
 
@@ -34,7 +34,7 @@ main {
   flex: 1;
   display: flex;
   justify-content: center;
-  align-items: flex-start;
+  align-items: center; /* ✅ centers card vertically */
   padding: 24px;
   box-sizing: border-box;
 }
@@ -45,9 +45,9 @@ main {
   border: 1px solid #e5e7eb;
   border-radius: 16px;
   padding: 24px;
-  max-width: 720px;
+  max-width: 480px; /* ✅ was 720px, tightened for home */
   width: 100%;
-  margin: 0 auto 20px;
+  margin: 0 auto;
   box-shadow: 0 4px 12px rgba(0,0,0,.04);
   text-align: center;
   box-sizing: border-box;
@@ -66,22 +66,20 @@ main {
   text-transform: uppercase;
   color: #fff;
   background-color: #ccc; /* fallback if no photo */
-
-}.avatar.sm {
+}
+.avatar.sm {
   width: 56px;
   height: 56px;
   font-size: 20px;
   margin-right: 12px;
   flex-shrink: 0;
 }
-/* Large avatar (Profile page) */
 .avatar.lg {
   width: 128px;
   height: 128px;
   font-size: 48px;
   margin: 0 auto 12px; /* center inside profile card */
 }
-
 .avatar.placeholder {
   background: #eee;
   display: grid;
@@ -153,19 +151,39 @@ textarea {
 
 /* ========== Buttons ========== */
 .btn {
-  padding: 12px 20px;
+  display: block;              /* ✅ force full width */
+  width: 100%;                 /* ✅ fill card container */
+  box-sizing: border-box;      /* ✅ padding included */
+  text-align: center;
+  padding: 14px 20px;          /* slightly taller for balance */
   border-radius: 8px;
   border: none;
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
+  line-height: 1.4;            /* ✅ avoids text cutoff */
   transition: background 0.2s;
   background: #10b981;
   color: #fff;
-  width: 100%;
-  margin-top: 16px;
+  text-decoration: none;       /* ✅ no underline */
 }
-.btn:hover { background: #059669; }
+
+.btn + .btn {
+  margin-top: 12px; /* ✅ consistent spacing between buttons */
+}
+
+.btn:hover {
+  background: #059669;
+}
+
+.btn.decline {
+  background: #f3f4f6;
+  color: #374151;
+}
+
+.btn.decline:hover {
+  background: #e5e7eb;
+}
 
 /* Small button variant (used in Nearby rows) */
 .profile-row .btn {
@@ -222,7 +240,7 @@ textarea {
   100% { opacity: 0; transform: translate(-50%, 20px); }
 }
 
-/* ========== Privacy Notice (below card) ========== */
+/* ========== Privacy Notice ========== */
 .privacy-bar {
   margin-top: 20px;
   font-size: 12px;
@@ -232,13 +250,18 @@ textarea {
   padding-top: 8px;
   width: 100%;
 }
-
 .privacy-bar a {
   color: #6b7280;
   text-decoration: underline;
 }
 
-
+/* Lock note inside card (Home only) */
+.privacy-note {
+  margin-top: 16px;
+  font-size: 13px;
+  color: #6b7280;
+  text-align: center;
+}
 
 /* ========== Bottom Navigation ========== */
 .bottom-nav {
@@ -257,7 +280,6 @@ textarea {
   border-top-right-radius: 12px;
   box-sizing: border-box;
 }
-
 .bottom-nav a {
   flex: 1;
   text-align: center;
@@ -272,13 +294,11 @@ textarea {
   white-space: nowrap;
   position: relative; /* for badge */
 }
-
 .bottom-nav a:hover { background: #f3f4f6; }
 .bottom-nav a.active {
   background: #10b981;
   color: #fff;
 }
-
 /* ✅ Requests badge */
 .bottom-nav .badge {
   position: absolute;
@@ -301,7 +321,6 @@ textarea {
   max-width: 720px;
   margin: 0 auto;
 }
-
 .profile-row {
   display: flex;
   align-items: center;
@@ -312,7 +331,6 @@ textarea {
   padding: 16px;
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
-
 .profile-row img.avatar {
   width: 56px;
   height: 56px;
@@ -320,18 +338,12 @@ textarea {
   object-fit: cover;
   margin-right: 12px;
 }
-
-.profile-text {
-  flex: 1;
-  margin-right: 12px;
-}
-
+.profile-text { flex: 1; margin-right: 12px; }
 .profile-name {
   font-size: 16px;
   font-weight: 700;
   color: #111827;
 }
-
 .profile-bio {
   font-size: 14px;
   color: #6b7280;
@@ -346,19 +358,13 @@ textarea {
   display: grid;
   gap: 24px;
 }
-
 .requests-page h2 {
   font-size: 18px;
   font-weight: 700;
   margin: 0 0 12px;
   color: #374151;
 }
-
-.requests-grid {
-  display: grid;
-  gap: 16px;
-}
-
+.requests-grid { display: grid; gap: 16px; }
 .requests-card {
   background: #fff;
   border: 1px solid #e5e7eb;
@@ -369,7 +375,6 @@ textarea {
   gap: 14px;
   box-shadow: 0 4px 12px rgba(0,0,0,.04);
 }
-
 .requests-card img {
   width: 64px;
   height: 64px;
@@ -377,10 +382,7 @@ textarea {
   object-fit: cover;
   flex-shrink: 0;
 }
-
-.requests-info {
-  flex: 1;
-}
+.requests-info { flex: 1; }
 .requests-info h3 {
   margin: 0;
   font-size: 16px;
@@ -391,26 +393,15 @@ textarea {
   font-size: 14px;
   color: #6b7280;
 }
-
 .requests-actions {
   display: flex;
   flex-direction: column;
   gap: 6px;
 }
-.btn.accept {
-  background: #10b981;
-  color: #fff;
-}
-.btn.accept:hover {
-  background: #059669;
-}
-.btn.decline {
-  background: #f3f4f6;
-  color: #374151;
-}
-.btn.decline:hover {
-  background: #e5e7eb;
-}
+.btn.accept { background: #10b981; color: #fff; }
+.btn.accept:hover { background: #059669; }
+.btn.decline { background: #f3f4f6; color: #374151; }
+.btn.decline:hover { background: #e5e7eb; }
 
 /* ========== Responsive ========== */
 @media (max-width: 768px) {
@@ -427,4 +418,17 @@ textarea {
 @media (max-width: 480px) {
   .bottom-nav { height: 56px; }
   .bottom-nav a { font-size: 13px; padding: 6px 2px; }
+}
+.footer-bar {
+  margin-top: auto;
+  text-align: center;
+  font-size: 12px;
+  color: #6b7280;
+  padding: 16px 0;
+  border-top: 1px solid #f3f4f6;
+  width: 100%;
+}
+.footer-bar a {
+  color: #6b7280;
+  text-decoration: underline;
 }

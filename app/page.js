@@ -4,31 +4,47 @@ import Link from 'next/link';
 
 export default function HomePage() {
   return (
-    <main>
-      <div className="card" style={{ flexDirection: "column", textAlign: "center" }}>
-        <h1 style={{ fontSize: "20px", fontWeight: 700, marginBottom: "8px" }}>
-          Real connections, without awkwardness.
-        </h1>
-        <p style={{ fontSize: "14px", color: "#6b7280", marginBottom: "20px" }}>
-          This MVP lets you discreetly connect with people around you.<br />
-          Only mutual consent shares contact details.
-        </p>
+    <>
+      {/* ===== Header ===== */}
+      <header className="page-header">
+        Icebreaker
+      </header>
 
-        <div style={{ display: "grid", gap: "10px", width: "100%" }}>
-          <Link href="/checkin" className="btn">
-            I’m here → Check in
-          </Link>
-          <Link href="/nearby" className="btn decline">
-            See who’s nearby
-          </Link>
-          <Link href="/requests" className="btn decline">
-            View requests
-          </Link>
-          <Link href="/profile" className="btn decline">
-            Edit my profile
-          </Link>
+      {/* ===== Main Content ===== */}
+      <main className="page" style={{ alignItems: "center" }}>
+        <div className="card">
+          {/* Title */}
+          <h2>Real connections, without awkwardness.</h2>
+          <p>
+            Meet people nearby, check in at cafés, <br />
+            and connect only when it’s mutual.
+          </p>
+
+          {/* Actions */}
+          <div style={{ display: "grid", gap: "12px", width: "100%" }}>
+            <Link href="/checkin" className="btn">
+              I’m here → Check in
+            </Link>
+            <Link href="/nearby" className="btn decline">
+              See who’s nearby
+            </Link>
+            <Link href="/profile" className="btn decline">
+              My profile
+            </Link>
+          </div>
+
+          {/* Safety Note */}
+          <div className="privacy-bar" style={{ borderTop: "none", marginTop: "16px" }}>
+            🔒 Your contact details are shared only when both sides agree.
+          </div>
         </div>
-      </div>
-    </main>
+      </main>
+
+      {/* ===== Footer ===== */}
+      <footer className="footer-bar">
+  © {new Date().getFullYear()} Icebreaker · <a href="/privacy-policy">Privacy</a> · <a href="#">Terms</a>
+</footer>
+
+    </>
   );
 }

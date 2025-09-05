@@ -1,0 +1,90 @@
+'use client';
+
+export default function PrivacyPolicyPage() {
+  return (
+    <main style={{ maxWidth: "800px", margin: "0 auto", padding: "40px 20px", fontFamily: "Inter, Arial, sans-serif", lineHeight: "1.6" }}>
+      <h1 style={{ color: "#065f46" }}>Privacy Policy</h1>
+      <p><strong>Effective Date:</strong> [Insert Date]</p>
+      <p>
+        Icebreaker (“we,” “our,” or “us”) values your privacy. This Privacy Policy explains how we
+        collect, use, and protect your information when you use the Icebreaker mobile application
+        (the “App”). By using our App, you agree to the terms outlined below.
+      </p>
+
+      <h2 style={{ color: "#065f46" }}>1. Information We Collect</h2>
+      <ul>
+        <li><strong>Profile Information:</strong> Display name, optional profile photo, bio, and social links you choose to provide.</li>
+        <li><strong>Location Data:</strong> Used only when you check in to a venue. Location data expires automatically after approximately 10 minutes.</li>
+        <li><strong>Connections:</strong> Requests, acceptances, and mutual matches to help you manage your network.</li>
+        <li><strong>Device & Usage Data:</strong> Technical details such as device type, app version, and logs to improve performance and security.</li>
+      </ul>
+
+      <h2 style={{ color: "#065f46" }}>2. How We Use Your Information</h2>
+      <ul>
+        <li>To enable check-ins and display nearby users.</li>
+        <li>To facilitate mutual connections and message requests.</li>
+        <li>To improve and secure our App.</li>
+        <li>To comply with legal obligations.</li>
+      </ul>
+
+      <h2 style={{ color: "#065f46" }}>3. Data Sharing</h2>
+      <ul>
+        <li>We do <strong>not</strong> sell or rent your personal data.</li>
+        <li>We may share limited data with:
+          <ul>
+            <li>Other users (only when you choose to share or accept a request).</li>
+            <li>Service providers (e.g., Google Firebase for hosting and storage).</li>
+            <li>Authorities, if required by law.</li>
+          </ul>
+        </li>
+      </ul>
+
+      <h2 style={{ color: "#065f46" }}>4. Data Retention</h2>
+      <ul>
+        <li>Check-in locations are stored temporarily and expire after ~10 minutes.</li>
+        <li>Your profile and connections remain until you delete your account.</li>
+        <li>Backups may be retained securely for operational needs.</li>
+      </ul>
+
+      <h2 style={{ color: "#065f46" }}>5. Your Privacy Choices</h2>
+      <ul>
+        <li>You can update or delete your profile at any time.</li>
+        <li>You may choose not to check in if you prefer not to share your location.</li>
+        <li>You can request full account and data deletion by contacting us.</li>
+      </ul>
+
+      <h2 style={{ color: "#065f46" }}>6. Security</h2>
+      <p>
+        We use encryption, secure storage, and access controls to protect your data. However, no
+        system is completely secure, and we cannot guarantee absolute security.
+      </p>
+
+      <h2 style={{ color: "#065f46" }}>7. Children’s Privacy</h2>
+      <p>
+        The Icebreaker App is not intended for individuals under the age of 18. We do not knowingly
+        collect personal data from minors.
+      </p>
+
+      <h2 style={{ color: "#065f46" }}>8. International Users</h2>
+      <p>
+        Your data may be stored on servers located outside your country of residence. By using
+        Icebreaker, you consent to the transfer of your data to such locations.
+      </p>
+
+      <h2 style={{ color: "#065f46" }}>9. Changes to This Policy</h2>
+      <p>
+        We may update this Privacy Policy from time to time. Changes will be posted in the App and
+        on our website with an updated effective date.
+      </p>
+
+      <h2 style={{ color: "#065f46" }}>10. Contact Us</h2>
+      <p>
+        If you have any questions about this Privacy Policy, please contact us:
+      </p>
+      <p>
+        📧 Email: <a href="mailto:your@email.com">your@email.com</a><br />
+        🌐 Website: <a href="https://yourdomain.com">yourdomain.com</a>
+      </p>
+    </main>
+  );
+}
