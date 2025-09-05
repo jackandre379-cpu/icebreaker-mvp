@@ -39,6 +39,10 @@ export default function NearbyPage() {
           new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
         );
 
+        // ✅ fetch profile to include firstName + photoURL in session
+        const selfProfileSnap = await getDoc(doc(db, 'profiles', user.uid));
+        const selfProfile = selfProfileSnap.exists() ? selfProfileSnap.data() : {};
+
         await setDoc(
           doc(db, 'sessions', user.uid),
           {
@@ -46,10 +50,13 @@ export default function NearbyPage() {
             venueBucket: vb,
             updatedAt: serverTimestamp(),
             expiresAt,
+            firstName: selfProfile.firstName || 'Anonymous',
+            photoURL: selfProfile.photoURL || null,
           },
           { merge: true }
         );
 
+        // ✅ listen to all sessions in this venue
         const q = query(collection(db, 'sessions'));
         const unsub = onSnapshot(q, async snap => {
           const now = Timestamp.now();
@@ -66,6 +73,7 @@ export default function NearbyPage() {
             }
           });
 
+          // ✅ load matching profiles
           const results = [];
           for (const uid of uids) {
             const p = await getDoc(doc(db, 'profiles', uid));
@@ -81,11 +89,10 @@ export default function NearbyPage() {
 
   const sendRequest = async (targetUid, fields) => {
     const user = await ensureAnonAuth();
-    const selfProfile = await getDoc(doc(db, 'profiles', user.uid));
-    const data = selfProfile.data() || {};
+    const selfProfile = (await getDoc(doc(db, 'profiles', user.uid))).data() || {};
 
     const hasShareable =
-      data.ig?.trim() || data.phone?.trim() || data.linkedin?.trim();
+      selfProfile.ig?.trim() || selfProfile.phone?.trim() || selfProfile.linkedin?.trim();
 
     if (!hasShareable) {
       setToast("⚠️ Please add at least one contact method (IG, phone, or LinkedIn) before sending requests.");
