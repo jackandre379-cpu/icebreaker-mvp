@@ -170,29 +170,36 @@ export default function RequestsPage() {
             )}
           </div>
         </section>
-{/* Connections */}
-<section>
-  <h2>Connected People</h2>
-  <div className="requests-grid">
-    {connections.map((c) => (
-      <div key={c.id} className="requests-card">
-        <Avatar
-          photoURL={c.otherProfile.photoURL}
-          firstName={c.otherProfile.firstName}
-          size={64}
-        />
-        <div className="requests-info">
-          <h3>{c.otherProfile.firstName || 'Someone'}</h3>
-          <FieldsDisplay obj={c.otherProfile} />  {/* ✅ Show real profile fields */}
-        </div>
-      </div>
-    ))}
-    {connections.length === 0 && (
-      <div className="empty">No connections yet.</div>
-    )}
-  </div>
-</section>
 
+        {/* Connections */}
+        <section>
+          <h2>Connected People</h2>
+          <div className="requests-grid">
+            {connections.map((c) => (
+              <div key={c.id} className="requests-card">
+                <Avatar
+                  photoURL={c.otherProfile.photoURL}
+                  firstName={c.otherProfile.firstName}
+                  size={64}
+                />
+                <div className="requests-info">
+                  <h3>{c.otherProfile.firstName || 'Someone'}</h3>
+                  <FieldsDisplay obj={c.otherProfile} />  {/* ✅ Show real profile fields */}
+                </div>
+              </div>
+            ))}
+            {connections.length === 0 && (
+              <div className="empty">No connections yet.</div>
+            )}
+          </div>
+        </section>
+
+        {/* ✅ Privacy footer */}
+        <div className="privacy-bar">
+          <a href="#">
+            Privacy-first: session-based presence, no exact GPS stored.
+          </a>
+        </div>
 
       </div>
     </>

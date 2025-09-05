@@ -115,7 +115,7 @@ export default function NearbyPage() {
         <div className="list">
           {!bucket && <div className="empty">Detecting your venue…</div>}
 
-          {profiles.map((p, i) => (
+          {profiles.map((p) => (
             <ProfileCard
               key={p.uid}
               profile={p}
@@ -126,6 +126,13 @@ export default function NearbyPage() {
           {profiles.length === 0 && bucket && (
             <div className="empty">No one here yet. Ask a friend to open the app.</div>
           )}
+
+          {/* ✅ Privacy notice inside list container */}
+          <div className="privacy-bar">
+            <a href="#">
+              Privacy-first: session-based presence, no exact GPS stored.
+            </a>
+          </div>
         </div>
 
         {toast && <div className="toast">{toast}</div>}

@@ -128,6 +128,13 @@ export default function ProfilePage() {
 
           <button className="btn" onClick={save}>Save Profile</button>
           {status && <div className="status">{status}</div>}
+
+          {/* ✅ Privacy footer inside card */}
+          <div className="privacy-bar">
+            <a href="#">
+              Privacy-first: session-based presence, no exact GPS stored.
+            </a>
+          </div>
         </div>
       </div>
     </>

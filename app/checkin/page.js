@@ -116,6 +116,13 @@ export default function CheckInPage() {
               <b>Venue bucket:</b> {bucket}
             </div>
           )}
+
+          {/* ✅ Privacy footer inside card */}
+          <div className="privacy-bar">
+            <a href="#">
+              Privacy-first: session-based presence, no exact GPS stored.
+            </a>
+          </div>
         </div>
 
         {toast && <div className="toast">{toast}</div>}
