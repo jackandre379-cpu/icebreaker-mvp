@@ -8,7 +8,7 @@ export default function ProfileCard({ profile, onConnect }) {
 
   return (
     <div className="profile-row">
-      <Avatar photoURL={photoURL} initials={initials} />
+      <Avatar photoURL={photoURL} initials={initials} size="sm" />
       <div className="profile-text">
         <div className="profile-name">{firstName}</div>
         {bio && <div className="profile-bio">{bio}</div>}
@@ -18,10 +18,10 @@ export default function ProfileCard({ profile, onConnect }) {
   );
 }
 
-function Avatar({ photoURL, initials }) {
+function Avatar({ photoURL, initials, size = "sm" }) {
   return (
     <div
-      className="avatar"
+      className={`avatar ${size}`}
       style={photoURL ? { backgroundImage: `url(${photoURL})` } : {}}
     >
       {!photoURL && initials}

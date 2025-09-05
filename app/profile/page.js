@@ -79,13 +79,12 @@ export default function ProfilePage() {
 
   return (
     <>
-      {/* ✅ Page header at the top */}
       <div className="page-header">My Profile</div>
 
       <div className="page">
         <div className="card">
-          {/* Avatar */}
-          <AvatarPreview photoURL={photoURL} firstName={firstName} size={96} />
+          {/* ✅ Unified Avatar */}
+          <Avatar photoURL={photoURL} firstName={firstName} size="lg" />
 
           {/* Name + Bio preview */}
           <h2 style={{ marginTop: "12px", marginBottom: "4px" }}>
@@ -127,7 +126,6 @@ export default function ProfilePage() {
             <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+123456789" />
           </div>
 
-          {/* Save button */}
           <button className="btn" onClick={save}>Save Profile</button>
           {status && <div className="status">{status}</div>}
         </div>
@@ -136,36 +134,15 @@ export default function ProfilePage() {
   );
 }
 
-// Avatar component
-function AvatarPreview({ photoURL, firstName, size = 60 }) {
+/* ✅ Unified Avatar */
+function Avatar({ photoURL, firstName, size = "sm" }) {
   const initials = (firstName?.trim()?.[0] || '?').toUpperCase();
-  if (photoURL) {
-    return (
-      <img
-        src={photoURL}
-        alt="Profile"
-        width={size}
-        height={size}
-        className="avatar"
-      />
-    );
-  }
   return (
     <div
-      className="avatar placeholder"
-      style={{
-        width: size,
-        height: size,
-        fontSize: size * 0.4,
-        display: "grid",
-        placeItems: "center",
-        borderRadius: "50%",
-        background: "#eee",
-        fontWeight: "700",
-        color: "#555",
-      }}
+      className={`avatar ${size}`}
+      style={photoURL ? { backgroundImage: `url(${photoURL})` } : {}}
     >
-      {initials}
+      {!photoURL && initials}
     </div>
   );
 }

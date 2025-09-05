@@ -54,23 +54,41 @@ main {
   overflow: hidden;
 }
 
-/* ✅ Avatar (unified for both photo & initials) */
+/* Avatar (large, used in profile page) */
 .avatar {
-  width: 56px;
-  height: 56px;
   border-radius: 50%;
-  flex-shrink: 0;
-  margin-right: 12px;
   background-size: cover;
   background-position: center;
   display: flex;
   align-items: center;
   justify-content: center;
   font-weight: 700;
-  font-size: 20px;
-  color: #fff;
-  background-color: #ccc; /* fallback gray */
   text-transform: uppercase;
+  color: #fff;
+  background-color: #ccc; /* fallback if no photo */
+
+}.avatar.sm {
+  width: 56px;
+  height: 56px;
+  font-size: 20px;
+  margin-right: 12px;
+  flex-shrink: 0;
+}
+/* Large avatar (Profile page) */
+.avatar.lg {
+  width: 128px;
+  height: 128px;
+  font-size: 48px;
+  margin: 0 auto 12px; /* center inside profile card */
+}
+
+.avatar.placeholder {
+  background: #eee;
+  display: grid;
+  place-items: center;
+  font-weight: 700;
+  color: #555;
+  border-radius: 50%;
 }
 
 /* Hide raw file input */
@@ -296,6 +314,14 @@ textarea {
   box-shadow: 0 2px 6px rgba(0,0,0,0.05);
 }
 
+.profile-row img.avatar {
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 12px;
+}
+
 .profile-text {
   flex: 1;
   margin-right: 12px;
@@ -345,11 +371,12 @@ textarea {
   box-shadow: 0 4px 12px rgba(0,0,0,.04);
 }
 
-.requests-card .avatar {
+.requests-card img {
   width: 64px;
   height: 64px;
-  margin: 0;
-  font-size: 24px;
+  border-radius: 50%;
+  object-fit: cover;
+  flex-shrink: 0;
 }
 
 .requests-info {
@@ -391,7 +418,7 @@ textarea {
   .page { padding: 16px; }
   .card { padding: 16px; }
   .profile-row { padding: 12px; }
-  .avatar { width: 48px; height: 48px; font-size: 18px; }
+  .profile-row img.avatar { width: 48px; height: 48px; }
   .profile-name { font-size: 15px; }
   .profile-bio { font-size: 13px; }
   .btn { font-size: 14px; padding: 10px 14px; }
