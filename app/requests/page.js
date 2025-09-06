@@ -13,6 +13,7 @@ import {
   addDoc,
   getDoc
 } from 'firebase/firestore';
+import { FaInstagram, FaLinkedin, FaWhatsapp } from "react-icons/fa";
 
 /* ---------------- Main Page ---------------- */
 
@@ -118,8 +119,8 @@ export default function RequestsPage() {
       aUid: req.fromUid,
       bUid: req.toUid,
       venueBucket: req.venueBucket,
-      fieldsAtoB, // what sender shared with receiver
-      fieldsBtoA, // what receiver shared with sender
+      fieldsAtoB,
+      fieldsBtoA,
       createdAt: serverTimestamp()
     });
 
@@ -184,7 +185,7 @@ export default function RequestsPage() {
                 />
                 <div className="requests-info">
                   <h3>{c.otherProfile.firstName || 'Someone'}</h3>
-                  <FieldsDisplay obj={c.otherProfile} />  {/* ✅ Show real profile fields */}
+                  <FieldsDisplay obj={c.otherProfile} />
                 </div>
               </div>
             ))}
@@ -194,7 +195,7 @@ export default function RequestsPage() {
           </div>
         </section>
 
-        {/* ✅ Privacy footer */}
+        {/* Privacy footer */}
         <div className="privacy-bar">
           <a href="/privacy-policy">
             Privacy-first: session-based presence, no exact GPS stored.
@@ -219,18 +220,28 @@ function FieldsDisplay({ obj }) {
         href={`https://instagram.com/${handle}`}
         target="_blank"
         rel="noreferrer"
-        className="pill"
+        className="pill flex items-center gap-2 hover:underline"
+        style={{ color: "#E1306C" }}
       >
-        📸 @{handle}
+        <FaInstagram size={20} color="#E1306C" />
+        @{handle}
       </a>
     );
   }
 
   if (obj?.phone && typeof obj.phone === 'string') {
     pills.push(
-      <span key="phone" className="pill">
-        📱 {obj.phone}
-      </span>
+      <a
+        key="wa"
+        href={`https://wa.me/${obj.phone}`}
+        target="_blank"
+        rel="noreferrer"
+        className="pill flex items-center gap-2 hover:underline"
+        style={{ color: "#25D366" }}
+      >
+        <FaWhatsapp size={20} color="#25D366" />
+        WhatsApp
+      </a>
     );
   }
 
@@ -241,14 +252,17 @@ function FieldsDisplay({ obj }) {
         href={obj.linkedin}
         target="_blank"
         rel="noreferrer"
-        className="pill"
+        className="pill flex items-center gap-2 hover:underline"
+        style={{ color: "#0077B5" }}
       >
-        🔗 LinkedIn
+        <FaLinkedin size={20} color="#0077B5" />
+        LinkedIn
       </a>
     );
   }
 
-  return pills.length ? <div className="pills">{pills}</div> : null;
+  // ✅ inline pills with spacing
+  return pills.length ? <div className="pills flex flex-wrap gap-6 mt-1">{pills}</div> : null;
 }
 
 function Avatar({ photoURL, firstName, size = 64 }) {

@@ -161,7 +161,7 @@ textarea {
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  line-height: 1.4;            /* ✅ avoids text cutoff */
+  line-height: 1;            /* ✅ avoids text cutoff */
   transition: background 0.2s;
   background: #10b981;
   color: #fff;
@@ -430,5 +430,27 @@ textarea {
 }
 .footer-bar a {
   color: #6b7280;
+  text-decoration: underline;
+}
+/* ========== Social Pills ========== */
+.pills {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;       /* ✅ space between each social link */
+  margin-top: 10px;   /* ✅ small gap above the row */
+}
+
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;       /* ✅ space between icon and text */
+  font-weight: 500;
+  text-decoration: none;
+    background: #f9fafb;
+  padding: 4px 10px;
+  border-radius: 20px;
+}
+
+.pill:hover {
   text-decoration: underline;
 }
