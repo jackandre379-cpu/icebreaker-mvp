@@ -34,7 +34,7 @@ export default function NearbyPage() {
         const vb = venueBucketFromLatLng(pos.coords.latitude, pos.coords.longitude, 3);
         setBucket(vb);
 
-        const EXPIRY_MINUTES = 10;
+        const EXPIRY_MINUTES = 60;
         const expiresAt = Timestamp.fromDate(
           new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
         );

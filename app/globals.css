@@ -161,7 +161,7 @@ textarea {
   cursor: pointer;
   font-size: 16px;
   font-weight: 600;
-  line-height: 1px;            /* ✅ avoids text cutoff */
+  line-height: 10px;            /* ✅ avoids text cutoff */
   transition: background 0.2s;
   background: #10b981;
   color: #fff;

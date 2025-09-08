@@ -16,7 +16,7 @@ export default function CheckInPage() {
   const [status, setStatus] = useState('');
   const [toast, setToast] = useState(null);
 
-  const EXPIRY_MINUTES = 10;
+  const EXPIRY_MINUTES = 60;
 
   const checkIn = async () => {
     setStatus('Requesting location...');
