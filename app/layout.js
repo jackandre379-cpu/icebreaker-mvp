@@ -5,7 +5,7 @@ import { Inter } from 'next/font/google';
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
 export const metadata = {
-  title: 'Icebreaker MVP',
+  title: ' aldingo',
   description: 'Discreet, mutual contact exchange',
 };
 
