@@ -7,7 +7,7 @@ export default function HomePage() {
     <>
       {/* ===== Header ===== */}
       <header className="page-header">
-        Icebreaker
+        Aldingo
       </header>
 
       {/* ===== Main Content ===== */}
