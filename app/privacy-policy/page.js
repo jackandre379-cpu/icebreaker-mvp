@@ -43,14 +43,24 @@ export default function PrivacyPolicyPage() {
       <ul>
         <li>Check-in locations are stored temporarily and expire after ~60 minutes.</li>
         <li>Your profile and connections remain until you delete your account.</li>
-        <li>Backups may be retained securely for operational needs.</li>
+        <li>When you delete your account, your profile and related data are permanently erased from our systems.</li>
       </ul>
 
       <h2 style={{ color: "#065f46" }}>5. Your Privacy Choices</h2>
       <ul>
         <li>You can update or delete your profile at any time.</li>
         <li>You may choose not to check in if you prefer not to share your location.</li>
-        <li>You can request full account and data deletion by contacting us.</li>
+        <li>
+          <strong>Profile Photos:</strong>  
+          If you choose to upload a profile picture, Aldingo will first ask for your permission to access your camera or photo library.  
+          This permission is used <em>only</em> for selecting or capturing a profile photo and is never used for any other purpose.
+        </li>
+        <li>
+          <strong>Account Deletion:</strong>  
+          You can permanently delete your account directly in the App by scrolling to the bottom of your Profile page and selecting “Delete my account.”  
+          For verification, you will be asked to type your display name before confirming.  
+          Once deleted, your profile, connections, and related data are permanently removed and cannot be recovered.
+        </li>
       </ul>
 
       <h2 style={{ color: "#065f46" }}>6. Security</h2>

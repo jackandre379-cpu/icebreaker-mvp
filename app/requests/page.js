@@ -114,15 +114,21 @@ export default function RequestsPage() {
     if (req.fieldsTo?.phone && toProfile.phone) fieldsBtoA.phone = toProfile.phone;
     if (req.fieldsTo?.linkedin && toProfile.linkedin) fieldsBtoA.linkedin = toProfile.linkedin;
 
-    // Save connection with both directions
-    await addDoc(collection(db, 'connections'), {
+    // Build connection object safely
+    const connectionData = {
       aUid: req.fromUid,
       bUid: req.toUid,
-      venueBucket: req.venueBucket,
       fieldsAtoB,
       fieldsBtoA,
       createdAt: serverTimestamp()
-    });
+    };
+
+    // only add venueBucket if it exists
+    if (req.venueBucket) {
+      connectionData.venueBucket = req.venueBucket;
+    }
+
+    await addDoc(collection(db, 'connections'), connectionData);
 
     await updateDoc(doc(db, 'requests', req.id), {
       status: 'accepted',
@@ -261,7 +267,6 @@ function FieldsDisplay({ obj }) {
     );
   }
 
-  // ✅ inline pills with spacing
   return pills.length ? <div className="pills flex flex-wrap gap-6 mt-1">{pills}</div> : null;
 }
 

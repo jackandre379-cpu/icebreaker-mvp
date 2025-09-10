@@ -1,9 +1,10 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { db, ensureAnonAuth, storage } from '../../lib/firebase';
-import { doc, getDoc, setDoc } from 'firebase/firestore';
+import { db, ensureAnonAuth, storage, auth } from '../../lib/firebase';
+import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
+import { deleteUser } from "firebase/auth";
 
 export default function ProfilePage() {
   const [firstName, setFirstName] = useState('');
@@ -13,6 +14,8 @@ export default function ProfilePage() {
   const [linkedin, setLinkedin] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [status, setStatus] = useState('');
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [verifyName, setVerifyName] = useState('');
 
   // Load profile
   useEffect(() => {
@@ -77,6 +80,40 @@ export default function ProfilePage() {
     }
   };
 
+  // ✅ Ask for permission before opening file picker
+  const requestPhotoPermission = (e) => {
+    e.preventDefault();
+    e.stopPropagation(); // prevent auto file input trigger
+
+    const ok = confirm(
+      "Aldingo needs access to your camera or photo library so you can upload a profile photo."
+    );
+    if (ok) {
+      document.getElementById("photoInput")?.click();
+    }
+  };
+
+  // ✅ Delete Account
+  const deleteAccount = async () => {
+    try {
+      const user = await ensureAnonAuth();
+
+      // Delete Firestore profile
+      await deleteDoc(doc(db, 'profiles', user.uid));
+
+      // Delete Auth account
+      if (auth.currentUser) {
+        await deleteUser(auth.currentUser);
+      }
+
+      alert("✅ Your account has been deleted.");
+      window.location.href = "/";
+    } catch (err) {
+      console.error("❌ Delete failed:", err);
+      alert(`Delete failed: ${err?.code || ''} ${err?.message || err}`);
+    }
+  };
+
   return (
     <>
       <div className="page-header">My Profile</div>
@@ -92,12 +129,18 @@ export default function ProfilePage() {
           </h2>
           {bio && <p style={{ marginBottom: "20px" }}>{bio}</p>}
 
-          {/* Upload photo button */}
+          {/* Upload photo button with permission */}
           <div className="form-group" style={{ textAlign: "center" }}>
-            <label className="upload-btn">
+            <label className="upload-btn" onClick={requestPhotoPermission}>
               Upload new photo
-              <input type="file" accept="image/*" onChange={uploadPhoto} hidden />
             </label>
+            <input
+              id="photoInput"
+              type="file"
+              accept="image/*"
+              onChange={uploadPhoto}
+              hidden
+            />
           </div>
 
           {/* Form fields */}
@@ -129,12 +172,52 @@ export default function ProfilePage() {
           <button className="btn" onClick={save}>Save Profile</button>
           {status && <div className="status">{status}</div>}
 
-          {/* ✅ Privacy footer inside card */}
+          {/* ✅ Privacy footer */}
           <div className="privacy-bar">
             <a href="/privacy-policy">
               Privacy-first: session-based presence, no exact GPS stored.
             </a>
           </div>
+
+          {/* ✅ Delete Account link */}
+          {!showDeleteConfirm ? (
+            <div style={{ marginTop: "24px", textAlign: "center" }}>
+              <a
+                href="#"
+                style={{ color: "#e3342f", fontSize: "14px" }}
+                onClick={(e) => {
+                  e.preventDefault();
+                  setShowDeleteConfirm(true);
+                }}
+              >
+                Delete my account
+              </a>
+            </div>
+          ) : (
+            <div style={{ marginTop: "16px", textAlign: "center" }}>
+              <p style={{ marginBottom: "8px", fontSize: "14px" }}>
+                Type <strong>{firstName || "your name"}</strong> to confirm deletion:
+              </p>
+              <input
+                value={verifyName}
+                onChange={(e) => setVerifyName(e.target.value)}
+                placeholder="Enter your name"
+                className="border p-2 rounded w-full"
+              />
+              <button
+                disabled={verifyName !== firstName}
+                onClick={deleteAccount}
+                className="btn danger"
+                style={{
+                  marginTop: "10px",
+                  backgroundColor: verifyName === firstName ? "#e3342f" : "#aaa",
+                  color: "#fff",
+                }}
+              >
+                Confirm Delete
+              </button>
+            </div>
+          )}
         </div>
       </div>
     </>
