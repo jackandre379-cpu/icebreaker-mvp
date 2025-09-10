@@ -31,25 +31,32 @@ export default function NearbyPage() {
       if (!navigator.geolocation) return;
 
       navigator.geolocation.getCurrentPosition(async pos => {
-        const vb = venueBucketFromLatLng(pos.coords.latitude, pos.coords.longitude, 3);
+        const vb = venueBucketFromLatLng(
+          pos.coords.latitude,
+          pos.coords.longitude,
+          3
+        );
         setBucket(vb);
 
+        // Session expires in 60 minutes
         const EXPIRY_MINUTES = 60;
         const expiresAt = Timestamp.fromDate(
           new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
         );
 
+        // Write/update session doc
         await setDoc(
           doc(db, 'sessions', user.uid),
           {
             uid: user.uid,
             venueBucket: vb,
             updatedAt: serverTimestamp(),
-            expiresAt,
+            expiresAt
           },
           { merge: true }
         );
 
+        // Subscribe to sessions in Firestore
         const q = query(collection(db, 'sessions'));
         const unsub = onSnapshot(q, async snap => {
           const now = Timestamp.now();
@@ -68,9 +75,18 @@ export default function NearbyPage() {
 
           const results = [];
           for (const uid of uids) {
-            const p = await getDoc(doc(db, 'profiles', uid));
-            results.push({ uid, ...(p.exists() ? p.data() : {}) });
+            const pSnap = await getDoc(doc(db, 'profiles', uid));
+            if (pSnap.exists()) {
+              const p = pSnap.data();
+
+              // ✅ Only include profiles that look "complete"
+              const hasProfile = p.firstName?.trim() && p.photoURL?.trim();
+              if (hasProfile) {
+                results.push({ uid, ...p });
+              }
+            }
           }
+
           setProfiles(results);
         });
 
@@ -88,9 +104,11 @@ export default function NearbyPage() {
       data.ig?.trim() || data.phone?.trim() || data.linkedin?.trim();
 
     if (!hasShareable) {
-      setToast("⚠️ Please add at least one contact method (IG, phone, or LinkedIn) before sending requests.");
+      setToast(
+        '⚠️ Please add at least one contact method (IG, phone, or LinkedIn) before sending requests.'
+      );
       setTimeout(() => {
-        window.location.href = "/profile";
+        window.location.href = '/profile';
       }, 2500);
       return;
     }
@@ -115,7 +133,7 @@ export default function NearbyPage() {
         <div className="list">
           {!bucket && <div className="empty">Detecting your venue…</div>}
 
-          {profiles.map((p) => (
+          {profiles.map(p => (
             <ProfileCard
               key={p.uid}
               profile={p}
@@ -124,7 +142,9 @@ export default function NearbyPage() {
           ))}
 
           {profiles.length === 0 && bucket && (
-            <div className="empty">No one here yet. Ask a friend to open the app.</div>
+            <div className="empty">
+              No one here yet. Ask a friend to open the app.
+            </div>
           )}
 
           {/* ✅ Privacy notice inside list container */}
@@ -141,7 +161,7 @@ export default function NearbyPage() {
       <ShareModal
         open={!!openShareForUid}
         onClose={() => setOpenShareForUid(null)}
-        onSend={(fields) => sendRequest(openShareForUid, fields)}
+        onSend={fields => sendRequest(openShareForUid, fields)}
       />
     </>
   );
