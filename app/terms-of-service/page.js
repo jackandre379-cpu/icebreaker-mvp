@@ -114,6 +114,14 @@ export default function TermsPage() {
           aldingo.com
         </a>
       </p>
+       <p style={{ marginTop: "30px" }}>
+  You can also view our{" "}
+  <a href="/privacy-policy" style={{ color: "#065f46" }}>
+    Privacy Policy
+  </a>
+  .
+</p>
+
     </main>
   );
 }

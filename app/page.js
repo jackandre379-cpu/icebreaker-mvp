@@ -42,7 +42,7 @@ export default function HomePage() {
 
       {/* ===== Footer ===== */}
       <footer className="footer-bar">
-  © {new Date().getFullYear()} Icebreaker · <a href="/privacy-policy">Privacy</a> · <a href="#">Terms</a>
+  © {new Date().getFullYear()} Icebreaker · <a href="/privacy-policy">Privacy</a> · <a href="/terms-of-service">Terms</a>
 </footer>
 
     </>

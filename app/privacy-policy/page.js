@@ -95,6 +95,14 @@ export default function PrivacyPolicyPage() {
         📧 Email: <a href="mailto:info@aldingo.com">info@aldingo.com</a><br />
         🌐 Website: <a href="https://aldingo.com">aldingo.com</a>
       </p>
+     <p style={{ marginTop: "30px" }}>
+  You can also view our{" "}
+  <a href="/terms-of-service" style={{ color: "#065f46" }}>
+    Terms of Service
+  </a>
+  .
+</p>
+
     </main>
   );
 }
