@@ -2,25 +2,24 @@
 
 import { useEffect, useState } from 'react';
 import { db, ensureAnonAuth } from '../../lib/firebase';
-import { venueBucketFromLatLng } from '../../lib/venue';
 import {
   collection,
   doc,
   getDoc,
   onSnapshot,
   query,
-  setDoc,
-  serverTimestamp,
+  where,
+  Timestamp,
   addDoc,
-  Timestamp
+  serverTimestamp
 } from 'firebase/firestore';
 import ProfileCard from '../../components/ProfileCard';
 import ShareModal from '../../components/ShareModal';
 
 export default function NearbyPage() {
-  const [bucket, setBucket] = useState(null);
   const [profiles, setProfiles] = useState([]);
   const [selfUid, setSelfUid] = useState(null);
+  const [hasSession, setHasSession] = useState(false);
   const [openShareForUid, setOpenShareForUid] = useState(null);
   const [toast, setToast] = useState(null);
 
@@ -28,70 +27,47 @@ export default function NearbyPage() {
     (async () => {
       const user = await ensureAnonAuth();
       setSelfUid(user.uid);
-      if (!navigator.geolocation) return;
 
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const vb = venueBucketFromLatLng(
-          pos.coords.latitude,
-          pos.coords.longitude,
-          3
-        );
-        setBucket(vb);
+      // ✅ Check if the user has a valid session
+      const sessionSnap = await getDoc(doc(db, 'sessions', user.uid));
+      const now = Timestamp.now();
+      if (sessionSnap.exists() && sessionSnap.data().expiresAt?.toMillis() > now.toMillis()) {
+        setHasSession(true);
+      } else {
+        setHasSession(false);
+        return; // don’t load others if not checked in
+      }
 
-        // Session expires in 60 minutes
-        const EXPIRY_MINUTES = 60;
-        const expiresAt = Timestamp.fromDate(
-          new Date(Date.now() + EXPIRY_MINUTES * 60 * 1000)
-        );
+      // ✅ Query only active sessions
+      const q = query(
+        collection(db, 'sessions'),
+        where("expiresAt", ">", now)
+      );
 
-        // Write/update session doc
-        await setDoc(
-          doc(db, 'sessions', user.uid),
-          {
-            uid: user.uid,
-            venueBucket: vb,
-            updatedAt: serverTimestamp(),
-            expiresAt
-          },
-          { merge: true }
-        );
+      const unsub = onSnapshot(q, async snap => {
+        const results = [];
+        for (const d of snap.docs) {
+          const data = d.data();
 
-        // Subscribe to sessions in Firestore
-        const q = query(collection(db, 'sessions'));
-        const unsub = onSnapshot(q, async snap => {
-          const now = Timestamp.now();
-          const uids = [];
+          // Skip self
+          if (d.id === user.uid) continue;
 
-          snap.forEach(d => {
-            const data = d.data();
-            if (
-              data.venueBucket === vb &&
-              d.id !== user.uid &&
-              data.expiresAt?.toMillis() > now.toMillis()
-            ) {
-              uids.push(d.id);
-            }
-          });
+          // Load profile
+          const pSnap = await getDoc(doc(db, 'profiles', d.id));
+          if (pSnap.exists()) {
+            const p = pSnap.data();
 
-          const results = [];
-          for (const uid of uids) {
-            const pSnap = await getDoc(doc(db, 'profiles', uid));
-            if (pSnap.exists()) {
-              const p = pSnap.data();
-
-              // ✅ Only include profiles that look "complete"
-              const hasProfile = p.firstName?.trim() && p.photoURL?.trim();
-              if (hasProfile) {
-                results.push({ uid, ...p });
-              }
+            // ✅ Only show complete profiles
+            const hasProfile = p.firstName?.trim() && p.photoURL?.trim();
+            if (hasProfile) {
+              results.push({ uid: d.id, ...p });
             }
           }
-
-          setProfiles(results);
-        });
-
-        return () => unsub();
+        }
+        setProfiles(results);
       });
+
+      return () => unsub();
     })().catch(console.error);
   }, []);
 
@@ -116,7 +92,6 @@ export default function NearbyPage() {
     await addDoc(collection(db, 'requests'), {
       fromUid: user.uid,
       toUid: targetUid,
-      venueBucket: bucket,
       status: 'pending',
       fieldsFrom: fields,
       createdAt: serverTimestamp()
@@ -131,9 +106,13 @@ export default function NearbyPage() {
 
       <div className="page">
         <div className="list">
-          {!bucket && <div className="empty">Detecting your venue…</div>}
+          {!hasSession && (
+            <div className="empty">
+              You need to <a href="/checkin">check in</a> first to see who’s nearby.
+            </div>
+          )}
 
-          {profiles.map(p => (
+          {hasSession && profiles.map(p => (
             <ProfileCard
               key={p.uid}
               profile={p}
@@ -141,13 +120,13 @@ export default function NearbyPage() {
             />
           ))}
 
-          {profiles.length === 0 && bucket && (
+          {hasSession && profiles.length === 0 && (
             <div className="empty">
-              No one here yet. Ask a friend to open the app.
+              No one here yet. Ask a friend to check in.
             </div>
           )}
 
-          {/* ✅ Privacy notice inside list container */}
+          {/* ✅ Privacy notice */}
           <div className="privacy-bar">
             <a href="/privacy-policy">
               Privacy-first: session-based presence, no exact GPS stored.
