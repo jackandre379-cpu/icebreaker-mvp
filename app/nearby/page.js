@@ -58,10 +58,10 @@ export default function NearbyPage() {
             const p = pSnap.data();
 
             // ✅ Only show complete profiles
-            const hasProfile = p.firstName?.trim() && p.photoURL?.trim();
-            if (hasProfile) {
-              results.push({ uid: d.id, ...p });
-            }
+            const hasProfile = p.firstName?.trim();
+if (hasProfile) {
+  results.push({ uid: d.id, ...p });
+}
           }
         }
         setProfiles(results);
