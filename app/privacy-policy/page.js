@@ -6,8 +6,8 @@ export default function PrivacyPolicyPage() {
       <h1 style={{ color: "#065f46" }}>Privacy Policy</h1>
       <p><strong>Effective Date:</strong> [Insert Date]</p>
       <p>
-        Icebreaker (“we,” “our,” or “us”) values your privacy. This Privacy Policy explains how we
-        collect, use, and protect your information when you use the Icebreaker mobile application
+        Aldingo (“we,” “our,” or “us”) values your privacy. This Privacy Policy explains how we
+        collect, use, and protect your information when you use the Aldingo mobile application
         (the “App”). By using our App, you agree to the terms outlined below.
       </p>
 
@@ -61,14 +61,14 @@ export default function PrivacyPolicyPage() {
 
       <h2 style={{ color: "#065f46" }}>7. Children’s Privacy</h2>
       <p>
-        The Icebreaker App is not intended for individuals under the age of 18. We do not knowingly
+        The Aldingo App is not intended for individuals under the age of 18. We do not knowingly
         collect personal data from minors.
       </p>
 
       <h2 style={{ color: "#065f46" }}>8. International Users</h2>
       <p>
         Your data may be stored on servers located outside your country of residence. By using
-        Icebreaker, you consent to the transfer of your data to such locations.
+        Aldingo, you consent to the transfer of your data to such locations.
       </p>
 
       <h2 style={{ color: "#065f46" }}>9. Changes to This Policy</h2>
