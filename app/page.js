@@ -41,10 +41,12 @@ export default function HomePage() {
       </main>
 
       {/* ===== Footer ===== */}
-      <footer className="footer-bar">
-  © {new Date().getFullYear()} Aldingo · <a href="/privacy-policy">Privacy</a> · <a href="/terms-of-service">Terms</a>
-</footer>
-
+      <footer className="footer-bar" style={{ fontSize: "14px", padding: "12px", textAlign: "center" }}>
+        © {new Date().getFullYear()} Inven LLC ·{" "}
+        <Link href="/privacy-policy">Privacy</Link> ·{" "}
+        <Link href="/terms-of-service">Terms</Link> ·{" "}
+        <Link href="/eula">EULA</Link>
+      </footer>
     </>
   );
 }
