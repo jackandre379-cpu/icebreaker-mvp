@@ -40,8 +40,12 @@ export default function HomePage() {
 
       {/* ===== Footer ===== */}
       <footer className="footer-bar">
-  © {new Date().getFullYear()} Aldingo · <a href="/privacy-policy">Privacy</a> · <a href="/terms-of-service">Terms</a>
+  © {new Date().getFullYear()} Aldingo · 
+  <a href="/privacy-policy">Privacy</a> · 
+  <a href="/terms-of-service">Terms</a> · 
+  <a href="/eula">EULA</a>
 </footer>
+
 
     </>
   );
