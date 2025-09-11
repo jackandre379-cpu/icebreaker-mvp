@@ -6,8 +6,9 @@ export default function PrivacyPolicyPage() {
       <h1 style={{ color: "#065f46" }}>Privacy Policy</h1>
       <p><strong>Effective Date:</strong> [September 10, 2025]</p>
       <p>
-        This Privacy Policy describes how <strong>Inven LLC</strong>, the owner of the Aldingo mobile application (“App”),
-        collects, uses, and protects your information. By using Aldingo, you agree to the terms outlined below.
+        Aldingo (“we,” “our,” or “us”) values your privacy. This Privacy Policy explains how we
+        collect, use, and protect your information when you use the Aldingo mobile application
+        (the “App”). By using our App, you agree to the terms outlined below.
       </p>
 
       <h2 style={{ color: "#065f46" }}>1. Information We Collect</h2>
@@ -50,12 +51,12 @@ export default function PrivacyPolicyPage() {
         <li>You can update or delete your profile at any time.</li>
         <li>You may choose not to check in if you prefer not to share your location.</li>
         <li>
-          <strong>Profile Photos:</strong><br />
+          <strong>Profile Photos:</strong>  
           If you choose to upload a profile picture, Aldingo will first ask for your permission to access your camera or photo library.  
           This permission is used <em>only</em> for selecting or capturing a profile photo and is never used for any other purpose.
         </li>
         <li>
-          <strong>Account Deletion:</strong><br />
+          <strong>Account Deletion:</strong>  
           You can permanently delete your account directly in the App by scrolling to the bottom of your Profile page and selecting “Delete my account.”  
           For verification, you will be asked to type your display name before confirming.  
           Once deleted, your profile, connections, and related data are permanently removed and cannot be recovered.
@@ -94,13 +95,14 @@ export default function PrivacyPolicyPage() {
         📧 Email: <a href="mailto:info@aldingo.com">info@aldingo.com</a><br />
         🌐 Website: <a href="https://aldingo.com">aldingo.com</a>
       </p>
+     <p style={{ marginTop: "30px" }}>
+  You can also view our{" "}
+  <a href="/terms-of-service" style={{ color: "#065f46" }}>
+    Terms of Service
+  </a>
+  .
+</p>
 
-      <p style={{ marginTop: "30px" }}>
-        You can also view our{" "}
-        <a href="/terms-of-service" style={{ color: "#065f46" }}>Terms of Service</a>{" "}
-        and{" "}
-        <a href="/eula" style={{ color: "#065f46" }}>End User License Agreement (EULA)</a>.
-      </p>
     </main>
   );
 }

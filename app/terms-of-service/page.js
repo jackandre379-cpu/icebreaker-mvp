@@ -17,10 +17,9 @@ export default function TermsPage() {
       </p>
 
       <p>
-        These Terms of Service (“Terms”) are a legal agreement between you
-        (“User”) and <strong>Inven LLC</strong> (“Company,” “we,” or “us”),
-        the owner of the Aldingo mobile application (“App”).
-        By downloading or using Aldingo, you agree to be bound by these Terms.
+        Welcome to Aldingo (“we,” “our,” or “us”). By downloading or using the
+        Aldingo mobile application (the “App”), you agree to these Terms of
+        Service (“Terms”). Please read them carefully.
       </p>
 
       <h2 style={{ color: "#065f46" }}>1. Eligibility</h2>
@@ -69,7 +68,7 @@ export default function TermsPage() {
       <h2 style={{ color: "#065f46" }}>5. Safety Disclaimer</h2>
       <p>
         Aldingo provides a platform to connect people but does not verify user
-        identities. Inven LLC is not responsible for interactions between users
+        identities. We are not responsible for interactions between users
         outside the app. Use caution and judgment when meeting new people.
       </p>
 
@@ -90,8 +89,8 @@ export default function TermsPage() {
       <h2 style={{ color: "#065f46" }}>8. Limitation of Liability</h2>
       <p>
         To the maximum extent permitted by law, Aldingo is provided “as is”
-        without warranties. Inven LLC is not liable for damages arising from use
-        of the App, including lost connections, misuse by others, or service
+        without warranties. We are not liable for damages arising from use of
+        the App, including lost connections, misuse by others, or service
         interruptions.
       </p>
 
@@ -115,18 +114,14 @@ export default function TermsPage() {
           aldingo.com
         </a>
       </p>
+       <p style={{ marginTop: "30px" }}>
+  You can also view our{" "}
+  <a href="/privacy-policy" style={{ color: "#065f46" }}>
+    Privacy Policy
+  </a>
+  .
+</p>
 
-      <p style={{ marginTop: "30px" }}>
-        You can also view our{" "}
-        <a href="/privacy-policy" style={{ color: "#065f46" }}>
-          Privacy Policy
-        </a>{" "}
-        and{" "}
-        <a href="/eula" style={{ color: "#065f46" }}>
-          End User License Agreement (EULA)
-        </a>
-        .
-      </p>
     </main>
   );
 }
