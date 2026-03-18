@@ -32,7 +32,7 @@ export default function NearbyPage() {
       setSelfUid(user.uid);
 
       // Reactively watch own session doc
-      unsubSession = onSnapshot(doc(db, ‘sessions’, user.uid), (sessionSnap) => {
+      unsubSession = onSnapshot(doc(db, 'sessions', user.uid), (sessionSnap) => {
         const now = Timestamp.now();
         const valid = sessionSnap.exists() &&
           sessionSnap.data().expiresAt?.toMillis() > now.toMillis();
@@ -43,14 +43,14 @@ export default function NearbyPage() {
           // Start watching nearby profiles if not already
           if (!unsubProfiles) {
             const q = query(
-              collection(db, ‘sessions’),
-              where(‘expiresAt’, ‘>’, now)
+              collection(db, 'sessions'),
+              where('expiresAt', '>', now)
             );
             unsubProfiles = onSnapshot(q, async (snap) => {
               const results = [];
               for (const d of snap.docs) {
                 if (d.id === user.uid) continue;
-                const pSnap = await getDoc(doc(db, ‘profiles’, d.id));
+                const pSnap = await getDoc(doc(db, 'profiles', d.id));
                 if (pSnap.exists()) {
                   const p = pSnap.data();
                   if (p.firstName?.trim()) {
@@ -115,7 +115,7 @@ export default function NearbyPage() {
         <div className="list">
           {!hasSession && (
             <div className="empty">
-              You need to <a href="/checkin">check in</a> first to see who’s nearby.
+              You need to <a href="/checkin">check in</a> first to see who's nearby.
             </div>
           )}
 
