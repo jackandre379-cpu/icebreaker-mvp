@@ -5,6 +5,9 @@ import { db, ensureAnonAuth, storage, auth } from '../../lib/firebase';
 import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { deleteUser } from "firebase/auth";
+import { FaInstagram, FaLinkedin, FaWhatsapp } from 'react-icons/fa';
+
+const BIO_MAX = 150;
 
 const COUNTRY_CODES = [
   { name: 'Morocco', dial: '+212', flag: '🇲🇦' },
@@ -185,22 +188,51 @@ export default function ProfilePage() {
           </div>
 
           <div className="form-group">
-            <label>Bio</label>
-            <textarea value={bio} onChange={(e) => setBio(e.target.value)} />
+            <label style={{ display: 'flex', justifyContent: 'space-between' }}>
+              <span>Bio</span>
+              <span style={{ fontSize: '12px', color: bio.length > BIO_MAX * 0.9 ? '#e3342f' : '#aaa' }}>
+                {bio.length}/{BIO_MAX}
+              </span>
+            </label>
+            <textarea
+              value={bio}
+              onChange={(e) => { if (e.target.value.length <= BIO_MAX) setBio(e.target.value); }}
+              placeholder="e.g. Product designer · open to collabs"
+            />
+          </div>
+
+          <div style={{ fontSize: '12px', fontWeight: '600', color: '#888', textTransform: 'uppercase', letterSpacing: '0.05em', margin: '8px 0 4px' }}>
+            Contact methods
           </div>
 
           <div className="form-group">
-            <label>Instagram</label>
-            <input value={ig} onChange={(e) => setIg(e.target.value)} placeholder="@username" />
+            <label><FaInstagram size={14} style={{ marginRight: 5, color: '#E1306C', verticalAlign: 'middle' }} />Instagram</label>
+            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+              <span style={{ padding: '8px 10px', background: '#f5f5f5', color: '#888', fontSize: '14px', borderRight: '1px solid #ddd' }}>@</span>
+              <input
+                style={{ border: 'none', outline: 'none', flex: 1, padding: '8px 10px', fontSize: '14px' }}
+                value={ig}
+                onChange={(e) => setIg(e.target.value.replace('@', ''))}
+                placeholder="username"
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label>LinkedIn</label>
-            <input value={linkedin} onChange={(e) => setLinkedin(e.target.value)} placeholder="linkedin.com/in/username" />
+            <label><FaLinkedin size={14} style={{ marginRight: 5, color: '#0077B5', verticalAlign: 'middle' }} />LinkedIn</label>
+            <div style={{ display: 'flex', alignItems: 'center', border: '1px solid #ddd', borderRadius: '8px', overflow: 'hidden' }}>
+              <span style={{ padding: '8px 6px 8px 10px', background: '#f5f5f5', color: '#888', fontSize: '12px', borderRight: '1px solid #ddd', whiteSpace: 'nowrap' }}>linkedin.com/in/</span>
+              <input
+                style={{ border: 'none', outline: 'none', flex: 1, padding: '8px 10px', fontSize: '14px' }}
+                value={linkedin}
+                onChange={(e) => setLinkedin(e.target.value)}
+                placeholder="username"
+              />
+            </div>
           </div>
 
           <div className="form-group">
-            <label>WhatsApp</label>
+            <label><FaWhatsapp size={14} style={{ marginRight: 5, color: '#25D366', verticalAlign: 'middle' }} />WhatsApp</label>
             <div style={{ display: 'flex', gap: '6px' }}>
               <select
                 value={countryDial}
@@ -219,6 +251,7 @@ export default function ProfilePage() {
                 type="tel"
               />
             </div>
+            <div style={{ fontSize: '11px', color: '#aaa', marginTop: '4px' }}>Only shared when you both connect</div>
           </div>
 
           <button className="btn" onClick={save}>Save Profile</button>
