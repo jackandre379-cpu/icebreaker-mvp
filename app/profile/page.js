@@ -6,11 +6,44 @@ import { doc, getDoc, setDoc, deleteDoc } from 'firebase/firestore';
 import { ref, uploadBytes, getDownloadURL } from "firebase/storage";
 import { deleteUser } from "firebase/auth";
 
+const COUNTRY_CODES = [
+  { name: 'Morocco', dial: '+212', flag: '🇲🇦' },
+  { name: 'Algeria', dial: '+213', flag: '🇩🇿' },
+  { name: 'Tunisia', dial: '+216', flag: '🇹🇳' },
+  { name: 'Egypt', dial: '+20', flag: '🇪🇬' },
+  { name: 'Saudi Arabia', dial: '+966', flag: '🇸🇦' },
+  { name: 'UAE', dial: '+971', flag: '🇦🇪' },
+  { name: 'France', dial: '+33', flag: '🇫🇷' },
+  { name: 'Spain', dial: '+34', flag: '🇪🇸' },
+  { name: 'Belgium', dial: '+32', flag: '🇧🇪' },
+  { name: 'Netherlands', dial: '+31', flag: '🇳🇱' },
+  { name: 'Germany', dial: '+49', flag: '🇩🇪' },
+  { name: 'Italy', dial: '+39', flag: '🇮🇹' },
+  { name: 'UK', dial: '+44', flag: '🇬🇧' },
+  { name: 'USA', dial: '+1', flag: '🇺🇸' },
+  { name: 'Canada', dial: '+1 CA', flag: '🇨🇦' },
+  { name: 'Turkey', dial: '+90', flag: '🇹🇷' },
+  { name: 'Senegal', dial: '+221', flag: '🇸🇳' },
+  { name: 'Ivory Coast', dial: '+225', flag: '🇨🇮' },
+  { name: 'Other', dial: '+', flag: '🌍' },
+];
+
+function parsePhone(fullPhone) {
+  if (!fullPhone) return { dial: '+212', number: '' };
+  for (const c of COUNTRY_CODES) {
+    if (c.dial !== '+' && fullPhone.startsWith(c.dial)) {
+      return { dial: c.dial, number: fullPhone.slice(c.dial.length).trim() };
+    }
+  }
+  return { dial: '+212', number: fullPhone };
+}
+
 export default function ProfilePage() {
   const [firstName, setFirstName] = useState('');
   const [bio, setBio] = useState('');
   const [ig, setIg] = useState('');
-  const [phone, setPhone] = useState('');
+  const [countryDial, setCountryDial] = useState('+212');
+  const [phoneNumber, setPhoneNumber] = useState('');
   const [linkedin, setLinkedin] = useState('');
   const [photoURL, setPhotoURL] = useState('');
   const [status, setStatus] = useState('');
@@ -27,7 +60,9 @@ export default function ProfilePage() {
         setFirstName(d.firstName || '');
         setBio(d.bio || '');
         setIg(d.ig || '');
-        setPhone(d.phone || '');
+        const parsed = parsePhone(d.phone || '');
+        setCountryDial(parsed.dial);
+        setPhoneNumber(parsed.number);
         setLinkedin(d.linkedin || '');
         setPhotoURL(d.photoURL || '');
       }
@@ -39,7 +74,7 @@ export default function ProfilePage() {
     const user = await ensureAnonAuth();
     await setDoc(
       doc(db, 'profiles', user.uid),
-      { firstName, bio, ig, phone, linkedin, photoURL },
+      { firstName, bio, ig, phone: phoneNumber ? `${countryDial}${phoneNumber}` : '', linkedin, photoURL },
       { merge: true }
     );
     setStatus('✅ Profile saved!');
@@ -165,8 +200,25 @@ export default function ProfilePage() {
           </div>
 
           <div className="form-group">
-            <label>Phone</label>
-            <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="+123456789" />
+            <label>WhatsApp</label>
+            <div style={{ display: 'flex', gap: '6px' }}>
+              <select
+                value={countryDial}
+                onChange={(e) => setCountryDial(e.target.value)}
+                style={{ width: '130px', flexShrink: 0, borderRadius: '8px', border: '1px solid #ddd', padding: '8px 4px', fontSize: '14px' }}
+              >
+                {COUNTRY_CODES.map((c) => (
+                  <option key={c.name} value={c.dial}>{c.flag} {c.dial}</option>
+                ))}
+              </select>
+              <input
+                style={{ flex: 1 }}
+                value={phoneNumber}
+                onChange={(e) => setPhoneNumber(e.target.value)}
+                placeholder={`${countryDial} XXXXXXXXX`}
+                type="tel"
+              />
+            </div>
           </div>
 
           <button className="btn" onClick={save}>Save Profile</button>

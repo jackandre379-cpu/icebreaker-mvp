@@ -14,7 +14,7 @@ export default function ShareModal({ open, onClose, onSend }) {
       <div style={modalStyle}>
         <h3>Choose what to share</h3>
         <label><input type="checkbox" checked={shareIG} onChange={e=>setShareIG(e.target.checked)} /> Instagram</label>
-        <label><input type="checkbox" checked={sharePhone} onChange={e=>setSharePhone(e.target.checked)} /> Phone</label>
+        <label><input type="checkbox" checked={sharePhone} onChange={e=>setSharePhone(e.target.checked)} /> WhatsApp</label>
         <label><input type="checkbox" checked={shareLinkedIn} onChange={e=>setShareLinkedIn(e.target.checked)} /> LinkedIn</label>
         <div style={{ display:'flex', gap: 8, marginTop: 12 }}>
           <button onClick={onClose}>Cancel</button>

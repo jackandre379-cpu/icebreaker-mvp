@@ -4,6 +4,8 @@ import { Inter } from 'next/font/google';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
 
+export const dynamic = 'force-dynamic';
+
 export const metadata = {
   title: ' Aldingo',
   description: 'Discreet, mutual contact exchange',
