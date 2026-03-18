@@ -24,51 +24,58 @@ export default function NearbyPage() {
   const [toast, setToast] = useState(null);
 
   useEffect(() => {
+    let unsubSession = null;
+    let unsubProfiles = null;
+
     (async () => {
       const user = await ensureAnonAuth();
       setSelfUid(user.uid);
 
-      // ✅ Check if the user has a valid session
-      const sessionSnap = await getDoc(doc(db, 'sessions', user.uid));
-      const now = Timestamp.now();
-      if (sessionSnap.exists() && sessionSnap.data().expiresAt?.toMillis() > now.toMillis()) {
-        setHasSession(true);
-      } else {
-        setHasSession(false);
-        return; // don’t load others if not checked in
-      }
+      // Reactively watch own session doc
+      unsubSession = onSnapshot(doc(db, ‘sessions’, user.uid), (sessionSnap) => {
+        const now = Timestamp.now();
+        const valid = sessionSnap.exists() &&
+          sessionSnap.data().expiresAt?.toMillis() > now.toMillis();
 
-      // ✅ Query only active sessions
-      const q = query(
-        collection(db, 'sessions'),
-        where("expiresAt", ">", now)
-      );
+        setHasSession(valid);
 
-      const unsub = onSnapshot(q, async snap => {
-        const results = [];
-        for (const d of snap.docs) {
-          const data = d.data();
-
-          // Skip self
-          if (d.id === user.uid) continue;
-
-          // Load profile
-          const pSnap = await getDoc(doc(db, 'profiles', d.id));
-          if (pSnap.exists()) {
-            const p = pSnap.data();
-
-            // ✅ Only show complete profiles
-            const hasProfile = p.firstName?.trim();
-if (hasProfile) {
-  results.push({ uid: d.id, ...p });
-}
+        if (valid) {
+          // Start watching nearby profiles if not already
+          if (!unsubProfiles) {
+            const q = query(
+              collection(db, ‘sessions’),
+              where(‘expiresAt’, ‘>’, now)
+            );
+            unsubProfiles = onSnapshot(q, async (snap) => {
+              const results = [];
+              for (const d of snap.docs) {
+                if (d.id === user.uid) continue;
+                const pSnap = await getDoc(doc(db, ‘profiles’, d.id));
+                if (pSnap.exists()) {
+                  const p = pSnap.data();
+                  if (p.firstName?.trim()) {
+                    results.push({ uid: d.id, ...p });
+                  }
+                }
+              }
+              setProfiles(results);
+            });
           }
+        } else {
+          // Session expired or gone — stop watching profiles
+          if (unsubProfiles) {
+            unsubProfiles();
+            unsubProfiles = null;
+          }
+          setProfiles([]);
         }
-        setProfiles(results);
       });
-
-      return () => unsub();
     })().catch(console.error);
+
+    return () => {
+      if (unsubSession) unsubSession();
+      if (unsubProfiles) unsubProfiles();
+    };
   }, []);
 
   const sendRequest = async (targetUid, fields) => {
