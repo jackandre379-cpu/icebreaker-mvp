@@ -215,7 +215,7 @@ export default function ProfilePage() {
                 style={{ flex: 1 }}
                 value={phoneNumber}
                 onChange={(e) => setPhoneNumber(e.target.value)}
-                placeholder={`${countryDial} XXXXXXXXX`}
+                placeholder="XXXXXXXXX"
                 type="tel"
               />
             </div>
